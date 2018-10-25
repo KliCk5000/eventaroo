@@ -3,9 +3,10 @@
 }
 
 body {
-  font-family: 'Kodchasan', sans-serif;
+  /* font-family: 'Kodchasan', sans-serif; */
 }
 
 .logo {
   font-family: 'Permanent Marker', cursive;
+  font-size: 4em;
 }
