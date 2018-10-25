@@ -4,9 +4,21 @@
 
 body {
   /* font-family: 'Kodchasan', sans-serif; */
+  /* https://www.w3schools.com/howto/howto_css_full_page.asp */
+  text-align: center;
 }
 
 .logo {
   font-family: 'Permanent Marker', cursive;
   font-size: 4em;
+  width: 320px;
+  margin: 200px auto 0 auto;
+}
+
+.center {
+  margin: 0 auto;
+}
+
+.landing-container {
+  width: 320px;
 }
