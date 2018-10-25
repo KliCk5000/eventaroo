@@ -4,4 +4,4 @@ Website to help users find events near them, based on price, and giving the abil
 
 ## Live site
 
-[Link to Eventaroo's live site]()
+[Link to Eventaroo's live site](https://klick5000.github.io/eventaroo/)
