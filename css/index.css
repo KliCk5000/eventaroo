@@ -5,11 +5,19 @@
 body {
   font-family: 'Kodchasan', sans-serif;
   /* https://www.w3schools.com/howto/howto_css_full_page.asp */
-  text-align: center;
 }
 
 .logo {
   font-family: 'Permanent Marker', cursive;
+}
+
+.center {
+  margin: 0 auto;
+  text-align: center;
+}
+
+.landing-container {
+  width: 320px;
 }
 
 .landing-logo {
@@ -24,12 +32,14 @@ body {
   margin: 0 auto;
 }
 
-.center {
-  margin: 0 auto;
+.result-listing {
+  border: 2px solid black;
+  margin: 10px;
 }
 
-.landing-container {
-  width: 320px;
+.result-image {
+  float: left;
+  margin: 5px;
 }
 
 .error {
@@ -38,4 +48,19 @@ body {
 
 .result-listing {
   border: 2px solid black;
+  padding: 5px;
+}
+
+.result-description {
+  float: left;
+}
+
+.clearfix::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+.hidden {
+  display: none;
 }
