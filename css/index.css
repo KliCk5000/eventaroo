@@ -31,3 +31,11 @@ body {
 .landing-container {
   width: 320px;
 }
+
+.error {
+  color: red;
+}
+
+.result-listing {
+  border: 2px solid black;
+}
