@@ -14,8 +14,9 @@
 
 <body>
   <header role="banner">
-    <div class="logo">Eventaroo</div>
+    <div class="logo landing-logo">Eventaroo</div>
   </header>
+<<<<<<< HEAD
   <section role="region">
     <div class="landing-container center">
         <form class="js-form">
@@ -33,6 +34,26 @@
             </div>
           </form>
     </div>
+=======
+  <section role="region" class="landing-container center">
+      <form class="js-form" action="/results.html">
+        <div class="form-line">
+          <label for="location">Find events near... </label>
+          <input type="text" name="location" class="js-location" placeholder="Denver, Co" required>
+        </div>
+        <div class="form-line">
+          <label for="free-mode">Show only free events</label>
+          <input type="checkbox" name="free-mode" class="js-free-mode">
+          </label>
+        </div>
+        <div class="form-line">
+          <input name="submit" type="submit" value="Go!">
+        </div>
+      </form>
+  </section>
+  <section role="region" class="results-container center">
+    <!-- Javascript will put results html here -->
+>>>>>>> f9f8479723b2f05c65df5b106227e42717c58ad9
   </section>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="js/index.js"></script>
