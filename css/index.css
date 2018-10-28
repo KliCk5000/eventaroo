@@ -28,7 +28,7 @@ body {
 
 .results-logo {
   font-size: 3em;
-  width: 320px;
+  width: 250px;
   margin: 0 auto;
 }
 
@@ -40,6 +40,8 @@ body {
 .result-image {
   float: left;
   margin: 5px;
+  width: 300px;
+  height: 150px;
 }
 
 .error {

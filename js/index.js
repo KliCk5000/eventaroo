@@ -44,8 +44,8 @@ function changeToResultPage(landingPageQuery) {
  */
 function initializeResultsPage() {
   $('.results-container').append(
-    `<p>Results will show here</p>
-    <p class="loading">Loading.........</p>
+    `
+    <p class="loading center">Loading.........</p>
     `
   )
 }
@@ -107,27 +107,39 @@ function formatQueryParams(params) {
 // display results from eventbrite
 function displayResults(responseJson) {
   $('.loading').remove();
-  $('.results-container').append(`Response loaded succesfully!`);
   console.log(responseJson);
 
-  for (let obj in responseJson.events) {
-    let name = responseJson.events[obj].name.text;
-    let logoUrl = (responseJson.events[obj].logo != null ? responseJson.events[obj].logo.url : 'unavailable');
+  for (let i = 0; i < responseJson.events.length; i++) {
+    let name = responseJson.events[i].name.text;
+    let logoUrl = (responseJson.events[i].logo != null ? responseJson.events[i].logo.url : 'https://picsum.photos/400/200?blur');
 
 
     $('.results-container').append(`
     <div class="result-listing clearfix">
-    <p>${obj}</p>
       <h2>Name: ${name}</h2>
       <img class="result-image" src="${logoUrl}" />
-      <p>Start time: ${responseJson.events[obj].start.local}</p>
-      <p>Url: ${responseJson.events[obj].url}</p>
-      <p>Is free: ${responseJson.events[obj].is_free}</p>
-      <button class="accordion">Click for Description</button>
-      <p class="result-description hidden">Description: ${responseJson.events[obj].description.text}</p>
+      <p>Start time: ${responseJson.events[i].start.local}</p>
+      <p>Url: ${responseJson.events[i].url}</p>
+      <p>Is free: ${responseJson.events[i].is_free}</p>
+      <button class="description-button">Click for Description</button>
+      <div class="result-description hidden">
+        ${responseJson.events[i].description.html}
+      </div>
     </div>
     `);
   }
+  watchDescriptionButtons();
+}
+
+/**
+ * watchDescriptionButtons()
+ * 
+ */
+function watchDescriptionButtons() {
+  $('.results-container').on('click', '.description-button', event => {
+    event.preventDefault();
+    $( event.target ).next().toggleClass('hidden');
+  });
 }
 
 
