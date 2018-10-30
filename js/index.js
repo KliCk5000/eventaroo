@@ -110,24 +110,37 @@ function displayResults(responseJson) {
   console.log(responseJson);
 
   for (let i = 0; i < responseJson.events.length; i++) {
-    let name = responseJson.events[i].name.text;
-    let logoUrl = (responseJson.events[i].logo != null ? responseJson.events[i].logo.url : 'https://picsum.photos/400/200?blur');
-
-
+    // Organize all the info I need into variables
+    let eventName = responseJson.events[i].name.text;
+    let eventUrl = responseJson.events[i].url;
+    let eventLogoUrl = (responseJson.events[i].logo != null ? responseJson.events[i].logo.url : 'https://picsum.photos/400/200?blur');
+    let eventFree = responseJson.events[i].is_free;
+    let eventDescription = responseJson.events[i].description.html;
+    
+    // These next two variables change the timestamp to something readable
+    let dateOfEvent = new Date(responseJson.events[i].start.local);
+    let dateOptions = { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit', };
+    
     $('.results-container').append(`
     <div class="result-listing clearfix">
-      <h2>Name: ${name}</h2>
-      <img class="result-image" src="${logoUrl}" />
-      <p>Start time: ${responseJson.events[i].start.local}</p>
-      <p>Url: ${responseJson.events[i].url}</p>
-      <p>Is free: ${responseJson.events[i].is_free}</p>
-      <button class="description-button">Click for Description</button>
-      <div class="result-description hidden">
-        ${responseJson.events[i].description.html}
-      </div>
+    <h2><a href="${eventUrl}" target=”_blank”>${eventName}</a></h2>
+    <img class="result-image" src="${eventLogoUrl}" />
+    <p>Start time: ${dateOfEvent.toLocaleDateString('en-US', dateOptions)}</p>
+    <p>Is free: ${eventFree}</p>
+    <div class="result-description small-description clearfix">
+    ${eventDescription}
+    <br/><br/>
+    <a class="read-more description-button read-text">...Read More...</a>
+    </div>
     </div>
     `);
+    
   }
+  
+  // Remove any unwanted tags
+  $('.result-description img').remove();
+  $('.result-description object').remove();
+
   watchDescriptionButtons();
 }
 
@@ -138,7 +151,12 @@ function displayResults(responseJson) {
 function watchDescriptionButtons() {
   $('.results-container').on('click', '.description-button', event => {
     event.preventDefault();
-    $( event.target ).next().toggleClass('hidden');
+    $( event.target ).parent().toggleClass('small-description large-description');
+    if ($( event.target ).parent().hasClass('large-description')) {
+      $( event.target ).text('Colapse Description');
+    } else {
+      $( event.target ).text('...Read More...');
+    }
   });
 }
 
