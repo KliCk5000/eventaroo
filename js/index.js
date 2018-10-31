@@ -1,18 +1,76 @@
 /**
  * watchLandingPage()
- * First event handler that listens for the "submit" on the landing page
+ * First event handler that listens for the "submit" and "near me" buttons on the landing page
  */
 function watchLandingPage() {
-  $('.landing-container').submit(event => { 
+  // Submit Button on Landing Page
+  $('.landing-container').submit(event => {
     event.preventDefault();
-    
+
+    // Check to see if user put in a location
+    let userLocation;
+
+    if ($('.js-location').val()) {
+      userLocation = $('.js-location').val();
+    } else {
+      // Try to put in user's location
+    }
+
+    console.log(userLocation);
+
     let landingPageQuery = [
-      $('.js-location').val(), // Location the user wants to search
+      userLocation, // Location the user wants to search
       $('.js-free-mode').is(":checked"), // Did they check the free-mode box?
     ];
 
     changeToResultPage(landingPageQuery);
   });
+
+  // Near me Button on Landing Page
+  $('.landing-container').on('click', '.js-near-me', event => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(geoSuccess, geoError);
+    }
+  });
+}
+
+
+function getReverseGeolocation(latitude, longitude) {
+  const googleLatLng = `latlng=${latitude},${longitude}`
+  const google_url = "https://maps.googleapis.com/maps/api/geocode/json?";
+  const google_api = '&key=' + 'AIzaSyDfecR4U' + 'FalgjCmVA2dLp4' + 'r2OdLAmKczvA';
+  const resultType = '&result_type=locality';
+  const completeURL = google_url + googleLatLng + resultType + google_api;
+
+  console.log(completeURL);
+
+  fetch(completeURL)
+    .then(response => {
+      if (response.ok) {
+        return response.json();
+      }
+      throw new Error(response.statusText);
+    })
+    .then(responseJson => {
+      if (responseJson.results[0] !== undefined) {
+        let city = responseJson.results[0].address_components[0].short_name;
+        let state = responseJson.results[0].address_components[2].short_name;
+        $('.js-location').val(`${city}, ${state}`);
+      }
+    })
+    .catch(err => {
+      $('.js-error-output').append('Could not get address: ' + err);
+    });
+
+}
+
+function geoSuccess(position) {
+  getReverseGeolocation(position.coords.latitude, position.coords.longitude);
+  $('.js-location').val(`...getting location...`);
+}
+
+function geoError() {
+  $('.js-error-output').append(`Sorry, could not get location`);
 }
 
 /**
@@ -21,9 +79,11 @@ function watchLandingPage() {
  * This changes from the landing page to the results screen
  * and handles any changes between the two screens
  */
-function changeToResultPage(landingPageQuery) {
+function changeToResultPage(landingPageQueryArray) {
   // Remove the landing page
   $('.landing-container').empty();
+
+  $('.results-container').toggleClass('hidden');
 
   // Update the logo to reflect the new screen
   $('.logo').removeClass('landing-logo');
@@ -32,10 +92,15 @@ function changeToResultPage(landingPageQuery) {
   // Send the landingPageQuery that we got from the landing page and
   // make the API request which will display the data on the results
   // page.
-  getLandingPageEventbriteData(landingPageQuery);
+  getLandingPageEventbriteData(landingPageQueryArray);
+  // Show the Results Filter Header to let the user change their query
+  addResultsFilterHeader(landingPageQueryArray);
+
   // While we are waiting for the results to come in, we can get the
   // results page ready for all the data.
   initializeResultsPage();
+
+  watchResultsPage();
 }
 
 /**
@@ -81,21 +146,43 @@ function getLandingPageEventbriteData(landingPageQuery) {
     })
     .then(responseJson => displayResults(responseJson))
     .catch(err => {
-      $('.results-container').append(`<p class="error">Something went wrong: ${err.message}</p>`);
+      $('.js-error-output').append(`Something went wrong: ${err.message}`);
       console.log(err);
     });
 
 }
 
+function getResultsPageEventbriteData(resultPageQuery) {
+
+  const queryString = formatQueryParams(resultPageQuery);
+  const url = `https://www.eventbriteapi.com/v3/events/search/?${queryString}`;
+
+  console.log(url);
+
+  // - GET FETCH request
+  fetch(url)
+    .then(response => {
+      if (response.ok) {
+        return response.json();
+      }
+      throw new Error(response.statusText);
+    })
+    .then(responseJson => displayResults(responseJson))
+    .catch(err => {
+      $('.js-error-output').append(`Something went wrong: ${err.message}`);
+      console.log(err);
+    });
+
+}
 
 /**
  * formatQueryParams(params)
  * Takes an object of keys and values and turns it into something like:
  * ?location.address=Denver%2C%20co&location.within=10mi&price=free
- */ 
+ */
 function formatQueryParams(params) {
   const queryItems = Object.keys(params)
-  .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`);
+    .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`);
   return queryItems.join('&');
 }
 
@@ -116,11 +203,18 @@ function displayResults(responseJson) {
     let eventLogoUrl = (responseJson.events[i].logo != null ? responseJson.events[i].logo.url : 'https://picsum.photos/400/200?blur');
     let eventFree = responseJson.events[i].is_free;
     let eventDescription = responseJson.events[i].description.html;
-    
+
     // These next two variables change the timestamp to something readable
     let dateOfEvent = new Date(responseJson.events[i].start.local);
-    let dateOptions = { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit', };
-    
+    let dateOptions = {
+      weekday: 'long',
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    };
+
     $('.results-container').append(`
     <div class="result-listing clearfix">
     <h2><a href="${eventUrl}" target=”_blank”>${eventName}</a></h2>
@@ -134,9 +228,9 @@ function displayResults(responseJson) {
     </div>
     </div>
     `);
-    
+
   }
-  
+
   // Remove any unwanted tags
   $('.result-description img').remove();
   $('.result-description object').remove();
@@ -151,20 +245,95 @@ function displayResults(responseJson) {
 function watchDescriptionButtons() {
   $('.results-container').on('click', '.description-button', event => {
     event.preventDefault();
-    $( event.target ).parent().toggleClass('small-description large-description');
-    if ($( event.target ).parent().hasClass('large-description')) {
-      $( event.target ).text('Colapse Description');
+    $(event.target).parent().toggleClass('small-description large-description');
+    if ($(event.target).parent().hasClass('large-description')) {
+      $(event.target).text('Colapse Description');
     } else {
-      $( event.target ).text('...Read More...');
+      $(event.target).text('...Read More...');
     }
   });
 }
 
+function addResultsFilterHeader(previousQuery) {
+  $('.results-container').append(`
+  <div class="results-filter">
+        <form class="js-form">
+            <div class="form-line">
+              <label for="location">Search another location: </label>
+              <input type="text" name="location" class="js-location" placeholder="Denver, Co">
+            </div>
+            <div class="form-line">
+              <label for="query">Search term: </label>
+              <input type="text" name="query" class="js-query" placeholder="Entertainment">
+            </div>
+            <div class="form-line">
+              <label for="free-mode">Show only free events</label>
+              <input type="checkbox" name="free-mode" class="js-free-mode">
+            </div>
+            <div class="form-line">
+              <label for="sort-by">Sort by: </label>
+              <select name="sort-by" class="js-sort-by">
+                  <option value="date">date decending</option>
+                  <option value="-date">date ascending</option>
+                  <option value="distance">distance decending</option>
+                  <option value="-distance">distance ascending</option>
+                  <option value="best">best to worst</option>
+                  <option value="-best">worst to best</option>
+                </select>
+            </div>
+            <div class="form-line">
+              <input name="filter" type="submit" value="Go!">
+            </div>
+          </form>
+    </div>
+  `);
+
+  $('.js-location').val(previousQuery[0]);
+  $('.js-free-mode').prop('checked', previousQuery[1]);
+}
+
+/**
+ * watchResultsPage()
+ * Event handler that listens for the "submit" on the results page
+ */
+function watchResultsPage() {
+  $('.results-container').submit(event => {
+    event.preventDefault();
+
+    let resultQuery = {
+      'location.address': $('.js-location').val(),
+      q: $('.js-query').val(),
+      'location.within': '10mi',
+      sort_by: $('.js-sort-by').val(),
+      price: ($('.js-free-mode').is(":checked") ? 'free' : 'paid'),
+      token: "JRKAA3O73D" + "DJB47QH5OT",
+    };
+
+    let isChecked = $('.js-free-mode').is(":checked");
+
+    getResultsPageEventbriteData(resultQuery);
+
+    let previousLocation = $('.js-location').val();
+
+    $('.results-container').empty();
+    addResultsFilterHeader(previousLocation);
+
+    // Update header with previous info
+    if (resultQuery["location.address"].val !== null) {
+      $('.js-location').val(resultQuery["location.address"]);
+    }
+    if (resultQuery.q.val !== null) {
+      $('.js-query').val(resultQuery.q);
+    }
+    $('.js-sort-by').val(resultQuery.sort_by);
+    console.log(isChecked);
+    $('.js-free-mode').prop('checked', isChecked);
+
+    initializeResultsPage();
+  })
+}
 
 // TODO: list
-// listen for more results buttons
-// display filter results?
-// listen for submit on filter?
 // listen for click on event to show more events
 
 /**
