@@ -48,6 +48,10 @@ body {
   color: red;
 }
 
+.results-filter {
+  border: 2px solid red;
+}
+
 .result-listing {
   border: 2px solid black;
   padding: 5px;
@@ -69,6 +73,7 @@ body {
   margin: 0; padding: 30px 0;
   /* "transparent" only works here because == rgba(0,0,0,0) */
   background-image: linear-gradient(to bottom, transparent, white);
+  cursor: pointer;
 }
 
 .clearfix::after {

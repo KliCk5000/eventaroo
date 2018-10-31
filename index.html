@@ -16,23 +16,27 @@
   <header role="banner">
     <div class="logo landing-logo">Eventaroo</div>
   </header>
-  <section role="region" class="landing-container center">
-      <form class="js-form">
-        <div class="form-line">
-          <label for="location">Find events near... </label>
-          <input type="text" name="location" class="js-location" placeholder="Denver, Co" required>
-        </div>
-        <div class="form-line">
-          <label for="free-mode">Show only free events</label>
-          <input type="checkbox" name="free-mode" class="js-free-mode">
-          </label>
-        </div>
-        <div class="form-line">
-          <input name="submit" type="submit" value="Go!">
-        </div>
-      </form>
+  <section role="region" class="js-error-output error">
   </section>
-  <section role="region" class="results-container">
+  <section role="region" class="landing-container center">
+    <form class="js-form">
+      <div class="form-line">
+        <label for="location">Find events near... </label>
+        <input type="text" name="location" class="js-location" placeholder="Denver, Co" required>
+        <label for="near-me"></label>
+        <input type="button" name="near-me" class="js-near-me" value="Near me" />
+      </div>
+      <div class="form-line">
+        <label for="free-mode">Show only free events</label>
+        <input type="checkbox" name="free-mode" class="js-free-mode">
+        </label>
+      </div>
+      <div class="form-line">
+        <input name="submit" type="submit" value="Go!">
+      </div>
+    </form>
+  </section>
+  <section role="region" class="results-container hidden">
     <!-- Javascript will put results html here -->
   </section>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
