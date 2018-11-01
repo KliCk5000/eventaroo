@@ -1,3 +1,5 @@
+const RESULT_LIST_ARRAY = [];
+
 /**
  * watchLandingPage()
  * First event handler that listens for the "submit" and "near me" buttons on the landing page
@@ -196,6 +198,7 @@ function displayResults(responseJson) {
   $('.loading').remove();
   console.log(responseJson);
 
+  // Create the data
   for (let i = 0; i < responseJson.events.length; i++) {
     // Organize all the info I need into variables
     let eventName = responseJson.events[i].name.text;
@@ -215,20 +218,25 @@ function displayResults(responseJson) {
       minute: '2-digit',
     };
 
-    $('.results-container').append(`
-    <div class="result-listing clearfix">
+    RESULT_LIST_ARRAY[i] = 
+    `<div class="result-listing clearfix">
     <h2><a href="${eventUrl}" target=”_blank”>${eventName}</a></h2>
     <img class="result-image" src="${eventLogoUrl}" />
     <p>Start time: ${dateOfEvent.toLocaleDateString('en-US', dateOptions)}</p>
     <p>Is free: ${eventFree}</p>
+    <input type="button" value="Add to Google Calendar" disabled>
     <div class="result-description small-description clearfix">
     ${eventDescription}
     <br/><br/>
     <a class="read-more description-button read-text">...Read More...</a>
     </div>
-    </div>
-    `);
-
+    </div>`;
+  }
+  
+  // Display the data on the DOM
+  let maxSearchResults = 10;
+  for ( let i = 0; i < RESULT_LIST_ARRAY.length && i < maxSearchResults; i++ ) {
+    $('.results-container').append( RESULT_LIST_ARRAY[i] );
   }
 
   // Remove any unwanted tags
@@ -236,6 +244,7 @@ function displayResults(responseJson) {
   $('.result-description object').remove();
 
   watchDescriptionButtons();
+  watchPageButtons();
 }
 
 /**
@@ -254,38 +263,44 @@ function watchDescriptionButtons() {
   });
 }
 
+function watchPageButtons() {
+  
+}
+
 function addResultsFilterHeader(previousQuery) {
   $('.results-container').append(`
-  <div class="results-filter">
-        <form class="js-form">
-            <div class="form-line">
-              <label for="location">Search another location: </label>
-              <input type="text" name="location" class="js-location" placeholder="Denver, Co">
-            </div>
-            <div class="form-line">
-              <label for="query">Search term: </label>
-              <input type="text" name="query" class="js-query" placeholder="Entertainment">
-            </div>
-            <div class="form-line">
-              <label for="free-mode">Show only free events</label>
-              <input type="checkbox" name="free-mode" class="js-free-mode">
-            </div>
-            <div class="form-line">
-              <label for="sort-by">Sort by: </label>
-              <select name="sort-by" class="js-sort-by">
-                  <option value="date">date decending</option>
-                  <option value="-date">date ascending</option>
-                  <option value="distance">distance decending</option>
-                  <option value="-distance">distance ascending</option>
-                  <option value="best">best to worst</option>
-                  <option value="-best">worst to best</option>
-                </select>
-            </div>
-            <div class="form-line">
-              <input name="filter" type="submit" value="Go!">
-            </div>
-          </form>
-    </div>
+  <div class="results-filter center">
+    <form class="js-form">
+      <ul>
+        <li class="form-line">
+          <label for="location">Search another location: </label>
+          <input type="text" name="location" class="js-location" placeholder="Denver, Co">
+        </li>
+        <li class="form-line">
+          <label for="query">Search term: </label>
+          <input type="text" name="query" class="js-query" placeholder="Entertainment">
+        </li>
+        <li class="form-line">
+          <label for="free-mode">Show only free events</label>
+          <input type="checkbox" name="free-mode" class="js-free-mode">
+        </li>
+        <li class="form-line">
+          <label for="sort-by">Sort by: </label>
+          <select name="sort-by" class="js-sort-by">
+              <option value="date">date decending</option>
+              <option value="-date">date ascending</option>
+              <option value="distance">Nearest</option>
+              <option value="-distance">Furthest</option>
+              <option value="best">Highest rated</option>
+              <option value="-best">Lowest rated</option>
+            </select>
+        </li>
+        <li class="form-line">
+          <input name="filter" type="submit" value="Go!">
+        </li>
+      </ul>
+    </form>
+  </div>
   `);
 
   $('.js-location').val(previousQuery[0]);
