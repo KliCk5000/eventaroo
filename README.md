@@ -7,3 +7,7 @@ Website to help users find events near them, based on price, and giving the abil
 [Link to Eventaroo's live site](https://klick5000.github.io/eventaroo/)
 
 [Link to beta Eventaroo Surge development build](https://eventaroo.surge.sh)
+
+## Wireframe image
+
+![Image of Wireframe](20181101_170508.jpg "Wireframe")
