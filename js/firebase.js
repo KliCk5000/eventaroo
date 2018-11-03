@@ -1,5 +1,5 @@
 // Initialize Firebase
-var config = {
+const config = {
   apiKey: "AIzaSyBVPLzkLRsHH" + "tXkt4o45W9J2u6XOsW0ozc",
   authDomain: "eventaroo-nd.firebaseapp.com",
   databaseURL: "https://eventaroo-nd.firebaseio.com",
@@ -10,16 +10,11 @@ var config = {
 
 firebase.initializeApp(config);
 
-var database = firebase.database();
-var dbRefUsers = database.ref('users/');
+let database = firebase.database();
+let dbRefUsers = database.ref('users/');
 
 // Google sign-in provider
-var provider = new firebase.auth.GoogleAuthProvider();
-
-// Log in variables
-const btnGoogle = $('.js-google-sign-in');
-const btnLogout = $('.js-log-out');
-const btnLogin = $('.js-log-in');
+let provider = new firebase.auth.GoogleAuthProvider();
 
 $('.js-log-out').on('click', e => {
   firebase.auth().signOut();
@@ -40,18 +35,18 @@ $('.js-google-sign-in').on('click', e => {
   firebase.auth().signInWithPopup(provider)
   .then(function (result) {
     // This gives you a Google Access Token. You can use it to access the Google API.
-    var token = result.credential.accessToken;
+    let token = result.credential.accessToken;
     // The signed-in user info.
-    var user = result.user;
+    let user = result.user;
     userId = user.uid;
   })
   .catch(function (error) {
     // Handle Errors here.
-    var errorCode = error.code;
-    var errorMessage = error.message;
+    let errorCode = error.code;
+    let errorMessage = error.message;
     // The email of the user's account used.
-    var email = error.email;
+    let email = error.email;
     // The firebase.auth.authCredential type that was used.
-    var credential = error.credential;
+    let credential = error.credential;
   });
 });
