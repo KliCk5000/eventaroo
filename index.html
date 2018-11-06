@@ -8,17 +8,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://fonts.googleapis.com/css?family=Kodchasan:400,500,700|Permanent+Marker" rel="stylesheet">
   <link rel="stylesheet" type="text/css" media="screen" href="css/normalize.css" />
-  <link type="text/css" rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/3.4.1/firebaseui.css" />
   <link rel="stylesheet" type="text/css" media="screen" href="css/index.css" />
-  <meta name="description" content="Find out what events are going on around you.">
+  <meta name="description" content="Eventaroo is the best place to find out what events are happening around you.">
 </head>
 
 <body>
+  <!-- Header that will always show the logo -->
   <header role="banner">
     <div class="logo landing-logo">Eventaroo</div>
   </header>
+
+  <!-- This section will output any errors that we recieve that the user needs to know about -->
   <section role="region" class="js-error-output error">
   </section>
+
+  <!-- This is the Landing Page which is the first thing the user sees -->
   <section role="region" class="landing-container center">
     <form class="js-form">
       <div class="form-line">
@@ -37,20 +41,28 @@
       </div>
     </form>
   </section>
+
+  <!-- This is an area where the user can easily log in and out of Google using OAuth2 -->
   <section role="region" class="firebase-auth">
-      <div id="firebaseui-auth-container" class="js-signon-container center">
-        <input type="button" name="google-sign-in" class="js-google-sign-in" value="Log in with Google">
-        <input type="button" name="log-out" class="js-log-out" value="Log out">
-        <p class="username"></p>
-      </div>
+    <div id="firebaseui-auth-container" class="js-signon-container center">
+      <input type="button" name="google-sign-in" class="js-google-sign-in" value="Log in with Google">
+      <input type="button" name="log-out" class="js-log-out" value="Log out">
+      <input type="button" name="test" class="js-test-button" value="Testing">
+      <p class="username"></p>
+    </div>
   </section>
+
   <section role="region" class="results-container hidden">
     <!-- Javascript will put results html here -->
   </section>
+
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/5.5.6/firebase.js"></script>
-  <script src="https://cdn.firebase.com/libs/firebaseui/3.4.1/firebaseui.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/5.5.7/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/5.5.7/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/5.5.7/firebase-database.js"></script>
+  <script src="https://apis.google.com/js/client.js?onload=handleClientLoad"></script>
   <script src="js/firebase.js"></script>
+  <script src="js/geolocation.js"></script>
   <script src="js/index.js"></script>
 </body>
 
