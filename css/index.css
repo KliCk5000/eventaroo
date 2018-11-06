@@ -44,11 +44,6 @@ li {
   margin: 0 auto;
 }
 
-.result-listing {
-  border: 2px solid black;
-  margin: 10px;
-}
-
 .result-image {
   float: left;
   margin: 5px;
@@ -68,22 +63,23 @@ li {
 .result-listing {
   border: 2px solid black;
   padding: 5px;
+  margin: 10px;
+  overflow-wrap: break-word;
 }
 
 .result-description {
-  float: left;
-  /* max-height: 120px; */
   position: relative;
   overflow: hidden;
 }
 
 .result-description .read-more {
-  position: absolute; 
-  bottom: 0; 
+  position: absolute;
+  bottom: 0;
   left: 0;
-  width: 100%; 
-  text-align: center; 
-  margin: 0; padding: 30px 0;
+  width: 100%;
+  text-align: center;
+  margin: 0;
+  padding: 30px 0;
   /* "transparent" only works here because == rgba(0,0,0,0) */
   background-image: linear-gradient(to bottom, transparent, lightgray);
   font-weight: bold;
