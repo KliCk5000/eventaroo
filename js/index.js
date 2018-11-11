@@ -3,7 +3,6 @@ const FETCH_ADDITIONAL = true;
 const resultList = {
   events: [],
 };
-const RESULT_LIST_ARRAY = [];
 
 /**
  * watchLandingPage()
