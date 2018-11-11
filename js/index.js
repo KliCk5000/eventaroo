@@ -36,8 +36,6 @@ function watchLandingPage() {
       navigator.geolocation.getCurrentPosition(geoSuccess, geoError);
     }
   });
-
-  addTestButtonWatch();
 }
 
 /**
@@ -76,6 +74,8 @@ function changeToResultPage(landingPageQuery) {
 
   // watch for any inputs on the result page
   watchResultsPage();
+
+  watchDescriptionButtons();
 }
 
 /**
@@ -189,8 +189,10 @@ function setCostOfEventBriteData(responseJson, eventId) {
   const costArray = new Array;
   for (const ticket of responseJson.ticket_classes) {
     if (ticket.cost) {
+      // if it has a cost add it,
       costArray.push(ticket.cost);
     } else {
+      // else give it a blank value;
       costArray.push({
         "display": "Unknown",
         "currency": "USD",
@@ -200,15 +202,19 @@ function setCostOfEventBriteData(responseJson, eventId) {
     }
   }
 
+  // Take an array of just the values
   const costValuesArray = new Array;
-  for (const price of costArray) {
-    costValuesArray.push(price.display);
+  for (const cost of costArray) {
+    costValuesArray.push(parseFloat(cost.major_value)/100);
   }
 
   costValuesArray.sort(function (a, b) {
     return a - b;
   });
 
+  console.log(costValuesArray);
+
+  // TODO: refactor this conversion
   priceRange = `Min: ${costValuesArray[0]} Max: ${costValuesArray[costValuesArray.length-1]}`;
 
 
@@ -277,7 +283,7 @@ function processResults(responseJson) {
     if (FETCH_ADDITIONAL) {
       fetchLocationOfEventBriteData(event.id, event.venue_id);
       if (event.is_free === false) {
-        fetchCostOfEventBriteData(event.id);
+        // fetchCostOfEventBriteData(event.id);
       };
     }
 
@@ -353,14 +359,7 @@ function displayResults() {
     $('.result-description object').remove();
   }
 
-  // Double check if signed into google
-  if (gapi.auth2.getAuthInstance().isSignedIn.get()) {
-    $('.js-add-to-calendar').removeAttr('disabled');
-  } else {
-    $('.js-add-to-calendar').attr('disabled', 'disabled');
-  }
-
-  watchDescriptionButtons();
+  
   watchAddToCalendarButton();
 }
 
@@ -393,17 +392,7 @@ function watchPageButtons() {
 function watchAddToCalendarButton() {
   $('.js-add-to-calendar').on('click', event => {
     event.preventDefault();
-
-    const eventId = $(event.target).parent('.result-listing').attr('id');
-    let eventIndex = resultList.events.findIndex(element => element.id === eventId);
-    console.log('clicked test button');
-
-    firebase.auth().currentUser.getIdToken()
-      .then(insertGoogleEvent(eventIndex))
-      .then(function (response) {
-        console.log(response);
-      });
-
+    addToCallendar(event);
   });
 }
 
