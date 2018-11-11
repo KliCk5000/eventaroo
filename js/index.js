@@ -295,7 +295,16 @@ function processResults(responseJson) {
       'id': (event.id ? event.id : 999),
       'venue_id': (event.venue_id ? event.venue_id : 'Unknown'),
       'summary': (event.name.text != null ? event.name.text : 'Unknown'),
-      'location': '...loading...',
+      'location': {
+        address: {
+          localized_address_display: '',
+          localized_multi_line_address_display: '',
+        },
+        latitude: '',
+        longitude: '',
+        name: '',
+        venu_id: '',
+      },
       'is_free': event.is_free,
       'cost': '...loading...',
       'costData': '',
@@ -333,8 +342,8 @@ function displayResults(firstIndex, numOfResults) {
   $('.loading').empty();
 
   $('.pagination').html(`
-    <input type="button" class="js-page-previous" value="&laquo;">
-    <input type="button" class="js-page-next" value="&raquo;">
+    <input type="button" class="js-page-previous" value="&laquo;" href="#pagination-top">
+    <input type="button" class="js-page-next" value="&raquo;" href="#pagination-top">
   `);
 
   $('.results-container').empty();
@@ -359,18 +368,18 @@ function displayResults(firstIndex, numOfResults) {
       <h2>
         <a href="${currentEvent.source.url}" target=”_blank”>${currentEvent.source.title}</a>
       </h2>
-      <img class="result-image" src="${currentEvent.logoUrl}" />
+      <img class="result-image" src="${currentEvent.logoUrl}" alt="${currentEvent.source.title}"/>
       <p>Start time: ${currentEvent.start.dateTimeReadable}</p>
       <p>End time: ${currentEvent.end.dateTimeReadable}</p>
-      <p class="js-event-location-name">Location name: ${currentEvent.location}</p>
-      <p class="js-event-location-address">Address: ${currentEvent.location}</p>
+      <p class="js-event-location-name">Location name: ${currentEvent.location.name}</p>
+      <p class="js-event-location-address">Address: ${currentEvent.location.address.localized_address_display}</p>
       <p class="js-event-price">Is free: ${currentEvent.is_free}</p>
       <p class="js-calendar-success"></p>
       <input type="button" class="js-add-to-calendar" value="Add to Google Calendar">
       <div class="result-description small-description clearfix">
         ${currentEvent.description.html}
         <br/><br/>
-        <a class="read-more description-button read-text">...Read More...</a>
+        <a class="read-more description-button read-text">Read More...</a>
       </div>
     </div>`);
 
@@ -394,6 +403,8 @@ function watchDescriptionButtons() {
       $(event.target).text('Colapse Description');
     } else {
       $(event.target).text('...Read More...');
+      let ele = $(event.target).closest('.result-listing')[0];
+      ele.scrollIntoView(true);
     }
   });
 }
@@ -403,7 +414,7 @@ function watchDescriptionButtons() {
  * Event listeners for each button on the page
  */
 function watchPageButtons() {
-  $('.pagination').on('click', event => {
+  $('#pagination-top').on('click', event => {
     event.preventDefault();
 
     if ($(event.target).hasClass('js-page-previous')) {
@@ -412,6 +423,20 @@ function watchPageButtons() {
     } else if ($(event.target).hasClass('js-page-next')) {
       resultList.currentPage += 5;
       displayResults(resultList.currentPage, 5);
+    }
+  })
+
+  $('#pagination-bottom').on('click', event => {
+    event.preventDefault();
+
+    if ($(event.target).hasClass('js-page-previous')) {
+      resultList.currentPage -= 5;
+      displayResults(resultList.currentPage, 5);
+      document.getElementById("pagination-top").scrollIntoView();
+    } else if ($(event.target).hasClass('js-page-next')) {
+      resultList.currentPage += 5;
+      displayResults(resultList.currentPage, 5);
+      document.getElementById("pagination-top").scrollIntoView();
     }
   })
 
@@ -483,8 +508,8 @@ function addResultsFilterHeader(previousQuery) {
           <select name="sort-by" class="js-sort-by">
               <option value="best">Highest rated</option>
               <option value="-best">Lowest rated</option>
-              <option value="date">date decending</option>
-              <option value="-date">date ascending</option>
+              <option value="date">Soonest</option>
+              <option value="-date">Latest</option>
               <option value="distance">Nearest</option>
               <option value="-distance">Furthest</option>
             </select>
@@ -506,7 +531,7 @@ function addResultsFilterHeader(previousQuery) {
  * Event handler that listens for the "submit" from the filter header on the results page
  */
 function watchResultsPage() {
-  $('.results-container').submit(event => {
+  $('.filter-results').submit(event => {
     event.preventDefault();
 
     // Create the query based on what the user put
