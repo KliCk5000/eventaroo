@@ -10,4 +10,4 @@ Website to help users find events near them, based on price, and giving the abil
 
 ## Wireframe image
 
-![Image of Wireframe](20181101_170508.jpg "Wireframe")
+![Image of Wireframe](content/20181101_170508.jpg "Wireframe")
