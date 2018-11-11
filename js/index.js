@@ -1,6 +1,7 @@
 const EVENTBRITE_TOKEN = "JRKAA3O73D" + "DJB47QH5OT";
 const FETCH_ADDITIONAL = true;
 const resultList = {
+  currentPage: 0,
   events: [],
 };
 
@@ -76,6 +77,7 @@ function changeToResultPage(landingPageQuery) {
   watchResultsPage();
   watchAddToCalendarButton();
   watchDescriptionButtons();
+  watchPageButtons();
 }
 
 /**
@@ -322,17 +324,35 @@ function processResults(responseJson) {
     resultList.events.push(currentEvent);
   }
 
-  displayResults();
+  displayResults(resultList.currentPage, 5);
   console.log(resultList);
 
 }
 
-function displayResults() {
-  $('.loading').remove();
+function displayResults(firstIndex, numOfResults) {
+  $('.loading').empty();
 
-  const maxSearchResults = 50;
+  $('.pagination').html(`
+    <input type="button" class="js-page-previous" value="&laquo;">
+    <input type="button" class="js-page-next" value="&raquo;">
+  `);
 
-  for (let i = 0; i < resultList.events.length && i < maxSearchResults; i++) {
+  $('.results-container').empty();
+
+  if (firstIndex < 0) {
+    resultList.currentPage = 0;
+    firstIndex = resultList.currentPage;
+  }
+  if (firstIndex >= resultList.events.length - 5) {
+    resultList.currentPage = resultList.events.length - (resultList.events.length - firstIndex) - 5;
+    firstIndex = resultList.currentPage;
+  }
+
+  const maxSearchResults = firstIndex + numOfResults;
+
+  firstIndex < resultList.events.length ? firstIndex : resultList.events.length - 1;
+
+  for (let i = firstIndex; i < resultList.events.length && i < maxSearchResults; i++) {
     let currentEvent = resultList.events[i];
     $('.results-container').append(`
     <div id="${currentEvent.id}" class="result-listing clearfix">
@@ -358,8 +378,6 @@ function displayResults() {
     $('.result-description img').remove();
     $('.result-description object').remove();
   }
-
-
 }
 
 /**
@@ -385,6 +403,17 @@ function watchDescriptionButtons() {
  * Event listeners for each button on the page
  */
 function watchPageButtons() {
+  $('.pagination').on('click', event => {
+    event.preventDefault();
+
+    if ($(event.target).hasClass('js-page-previous')) {
+      resultList.currentPage -= 5;
+      displayResults(resultList.currentPage, 5);
+    } else if ($(event.target).hasClass('js-page-next')) {
+      resultList.currentPage += 5;
+      displayResults(resultList.currentPage, 5);
+    }
+  })
 
 }
 
@@ -433,7 +462,7 @@ function insertGoogleEvent(eventIndex) {
  * Show the filter header at the top of the page
  */
 function addResultsFilterHeader(previousQuery) {
-  $('.results-container').append(`
+  $('.filter-results').html(`
   <div class="results-filter center">
     <form class="js-form">
       <ul>
@@ -513,6 +542,25 @@ function watchResultsPage() {
     // Finally, initialize the Results page (show loading...) until results come in
     loadResultsPage();
   })
+}
+
+// When the user scrolls down 20px from the top of the document, show the button
+window.onscroll = function () {
+  scrollFunction()
+};
+
+function scrollFunction() {
+  if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+    document.getElementById("top-button").style.display = "block";
+  } else {
+    document.getElementById("top-button").style.display = "none";
+  }
+}
+
+// When the user clicks on the button, scroll to the top of the document
+function topFunction() {
+  document.body.scrollTop = 0; // For Safari
+  document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
 }
 
 /**
