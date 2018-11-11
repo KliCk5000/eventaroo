@@ -23,6 +23,8 @@ provider.setCustomParameters({
 // Log Out button
 $('.js-log-out').on('click', e => {
   firebase.auth().signOut();
+  $('.js-google-sign-in').removeClass('hidden');
+  $('.js-log-out').addClass('hidden');
   console.log('User chose to log out');
 });
 
@@ -30,8 +32,12 @@ $('.js-log-out').on('click', e => {
 firebase.auth().onAuthStateChanged(firebaseUser => {
   if (firebaseUser) {
     $('.username').text(`Hello ${firebaseUser.displayName}`);
+    $('.js-google-sign-in').addClass('hidden');
+    $('.js-log-out').removeClass('hidden');
   } else {
     $('.username').text(`Not signed-in`);
+    $('.js-google-sign-in').removeClass('hidden');
+    $('.js-log-out').addClass('hidden');
   }
 });
 
@@ -73,16 +79,25 @@ function addToCallendar(event) {
       console.log('Google OAuth2 is signed in');
     } else {
       gapi.client.init(calendarConfig)
-          .then(function () {
-            // Check to see if google has your authenitcation
-            if (gapi.auth2.getAuthInstance().isSignedIn.get()) {
-              console.log('Google OAuth2 is signed in');
-              insertEvent(currentEvent);
-            } else {
-              ('.js-calendar-success').text('Something went wrong with Google Authentication, so you cant add to google calander. Try again later.');
-              console.log('Something went wrong with Google Authentication, so you cant add to google calander');
-            }
-          });
+        .then(function () {
+          // Check to see if google has your authenitcation
+          if (gapi.auth2.getAuthInstance().isSignedIn.get()) {
+            console.log('Google OAuth2 is signed in');
+            insertEvent(currentEvent);
+          } else {
+            gapi.auth2.getAuthInstance().signIn()
+            .then(function () {
+              // Check to see if google has your authenitcation
+              if (gapi.auth2.getAuthInstance().isSignedIn.get()) {
+                console.log('Google OAuth2 is signed in');
+                insertEvent(currentEvent);
+              } else {
+                $('.js-calendar-success').text('Something went wrong with Google Authentication, so you cant add to google calander. Try again later.');
+                console.log('Something went wrong with Google Authentication, so you cant add to google calander');
+              }
+            });
+          }
+        });
     }
 
 
@@ -102,7 +117,7 @@ function addToCallendar(event) {
               console.log('Google OAuth2 is signed in');
               insertEvent(currentEvent);
             } else {
-              ('.js-calendar-success').text('Something went wrong with Google Authentication, so you cant add to google calander. Try again later.');
+              $('.js-calendar-success').text('Something went wrong with Google Authentication, so you cant add to google calander. Try again later.');
               console.log('Something went wrong with Google Authentication, so you cant add to google calander');
             }
           });

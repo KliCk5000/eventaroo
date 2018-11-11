@@ -28,9 +28,7 @@ li {
   text-align: center;
 }
 
-.landing-container {
-  width: 320px;
-}
+.landing-container {}
 
 .landing-logo {
   font-size: 4em;
@@ -55,6 +53,10 @@ li {
   color: red;
 }
 
+.js-signon-container {
+  margin: 10px;
+}
+
 .results-filter {
   border: 2px solid red;
   min-height: 100px;
@@ -62,7 +64,7 @@ li {
 
 .result-listing {
   border: 2px solid black;
-  padding: 5px;
+  padding: 15px;
   margin: 10px;
   overflow-wrap: break-word;
 }

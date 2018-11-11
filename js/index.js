@@ -49,6 +49,7 @@ function changeToResultPage(landingPageQuery) {
 
   // Unhide the results container
   $('.results-container').toggleClass('hidden');
+  $('.js-signon-container').toggleClass('hidden');
 
   // Update the logo to reflect the new screen
   $('.logo').removeClass('landing-logo');
@@ -73,7 +74,7 @@ function changeToResultPage(landingPageQuery) {
 
   // watch for any inputs on the result page
   watchResultsPage();
-
+  watchAddToCalendarButton();
   watchDescriptionButtons();
 }
 
@@ -204,7 +205,7 @@ function setCostOfEventBriteData(responseJson, eventId) {
   // Take an array of just the values
   const costValuesArray = new Array;
   for (const cost of costArray) {
-    costValuesArray.push(parseFloat(cost.major_value)/100);
+    costValuesArray.push(parseFloat(cost.major_value) / 100);
   }
 
   costValuesArray.sort(function (a, b) {
@@ -358,8 +359,7 @@ function displayResults() {
     $('.result-description object').remove();
   }
 
-  
-  watchAddToCalendarButton();
+
 }
 
 /**
@@ -389,8 +389,9 @@ function watchPageButtons() {
 }
 
 function watchAddToCalendarButton() {
-  $('.js-add-to-calendar').on('click', event => {
+  $('.results-container').on('click', '.js-add-to-calendar', event => {
     event.preventDefault();
+    console.log('click');
     addToCallendar(event);
   });
 }
