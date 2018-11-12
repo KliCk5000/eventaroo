@@ -431,7 +431,7 @@ function watchPageButtons() {
       displayResults(resultList.currentPage, resultList.numberOfResults);
       document.getElementById("pagination-top").scrollIntoView();
     } else if ($(event.target).hasClass('js-page-next')) {
-      if (resultList.currentPage >= resultList.events.length / resultList.numberOfResults) {
+      if (resultList.currentPage <= (resultList.events.length / resultList.numberOfResults) - 1) {
         resultList.currentPage++;
       };
       displayResults(resultList.currentPage, resultList.numberOfResults);
