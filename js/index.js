@@ -2,6 +2,7 @@ const EVENTBRITE_TOKEN = "JRKAA3O73D" + "DJB47QH5OT";
 const FETCH_ADDITIONAL = true;
 const resultList = {
   currentPage: 0,
+  numberOfResults: 5,
   events: [],
 };
 
@@ -161,7 +162,7 @@ function setLocationOfEventBriteData(responseJson, eventId, venueId) {
 
   // Try to update location of the event on screen
   $(`#${resultList.events[eventIndex].id}`).find('.js-event-location-name').text(`Venue Name: ${resultList.events[eventIndex].location.name}`);
-  $(`#${resultList.events[eventIndex].id}`).find('.js-event-location-address').text(`Location: ${resultList.events[eventIndex].location.address.localized_address_display}`);
+  $(`#${resultList.events[eventIndex].id}`).find('.js-event-location-address').text(`Address: ${resultList.events[eventIndex].location.address.localized_address_display}`);
 
   if (resultList.events[eventIndex].location.address.localized_address_display === null) {
     $(`#${resultList.events[eventIndex].id}`).find('.js-event-location').text(`Location: Somewhere far far away...`);
@@ -214,7 +215,6 @@ function setCostOfEventBriteData(responseJson, eventId) {
     return a - b;
   });
 
-  console.log(costValuesArray);
 
   // TODO: refactor this conversion
   priceRange = `Min: ${costValuesArray[0]} Max: ${costValuesArray[costValuesArray.length-1]}`;
@@ -242,6 +242,8 @@ function formatQueryParams(params) {
 }
 
 function processResults(responseJson) {
+  resultList.currentPage = 0;
+
   // Take the responseJson object and grab what you need
   // Start with just the events
   const eventArray = responseJson.events;
@@ -333,12 +335,12 @@ function processResults(responseJson) {
     resultList.events.push(currentEvent);
   }
 
-  displayResults(resultList.currentPage, 5);
+  displayResults(resultList.currentPage, resultList.numberOfResults);
   console.log(resultList);
 
 }
 
-function displayResults(firstIndex, numOfResults) {
+function displayResults(pageNumber, numOfResults) {
   $('.loading').empty();
 
   $('.pagination').html(`
@@ -348,20 +350,9 @@ function displayResults(firstIndex, numOfResults) {
 
   $('.results-container').empty();
 
-  if (firstIndex < 0) {
-    resultList.currentPage = 0;
-    firstIndex = resultList.currentPage;
-  }
-  if (firstIndex >= resultList.events.length - 5) {
-    resultList.currentPage = resultList.events.length - (resultList.events.length - firstIndex) - 5;
-    firstIndex = resultList.currentPage;
-  }
+  let firstIndex = pageNumber * numOfResults;
 
-  const maxSearchResults = firstIndex + numOfResults;
-
-  firstIndex < resultList.events.length ? firstIndex : resultList.events.length - 1;
-
-  for (let i = firstIndex; i < resultList.events.length && i < maxSearchResults; i++) {
+  for (let i = firstIndex; i < resultList.events.length && i < firstIndex + numOfResults; i++) {
     let currentEvent = resultList.events[i];
     $('.results-container').append(`
     <div id="${currentEvent.id}" class="result-listing clearfix">
@@ -371,7 +362,7 @@ function displayResults(firstIndex, numOfResults) {
       <img class="result-image" src="${currentEvent.logoUrl}" alt="${currentEvent.source.title}"/>
       <p>Start time: ${currentEvent.start.dateTimeReadable}</p>
       <p>End time: ${currentEvent.end.dateTimeReadable}</p>
-      <p class="js-event-location-name">Location name: ${currentEvent.location.name}</p>
+      <p class="js-event-location-name">Venue Name: ${currentEvent.location.name}</p>
       <p class="js-event-location-address">Address: ${currentEvent.location.address.localized_address_display}</p>
       <p class="js-event-price">Is free: ${currentEvent.is_free}</p>
       <p class="js-calendar-success"></p>
@@ -418,11 +409,15 @@ function watchPageButtons() {
     event.preventDefault();
 
     if ($(event.target).hasClass('js-page-previous')) {
-      resultList.currentPage -= 5;
-      displayResults(resultList.currentPage, 5);
+      if (resultList.currentPage > 0) {
+        resultList.currentPage--;
+      };
+      displayResults(resultList.currentPage, resultList.numberOfResults);
     } else if ($(event.target).hasClass('js-page-next')) {
-      resultList.currentPage += 5;
-      displayResults(resultList.currentPage, 5);
+      if (resultList.currentPage <= (resultList.events.length / resultList.numberOfResults) - 1) {
+        resultList.currentPage++;
+      };
+      displayResults(resultList.currentPage, resultList.numberOfResults);
     }
   })
 
@@ -430,12 +425,16 @@ function watchPageButtons() {
     event.preventDefault();
 
     if ($(event.target).hasClass('js-page-previous')) {
-      resultList.currentPage -= 5;
-      displayResults(resultList.currentPage, 5);
+      if (resultList.currentPage > 0) {
+        resultList.currentPage--;
+      };
+      displayResults(resultList.currentPage, resultList.numberOfResults);
       document.getElementById("pagination-top").scrollIntoView();
     } else if ($(event.target).hasClass('js-page-next')) {
-      resultList.currentPage += 5;
-      displayResults(resultList.currentPage, 5);
+      if (resultList.currentPage >= resultList.events.length / resultList.numberOfResults) {
+        resultList.currentPage++;
+      };
+      displayResults(resultList.currentPage, resultList.numberOfResults);
       document.getElementById("pagination-top").scrollIntoView();
     }
   })
@@ -445,7 +444,6 @@ function watchPageButtons() {
 function watchAddToCalendarButton() {
   $('.results-container').on('click', '.js-add-to-calendar', event => {
     event.preventDefault();
-    console.log('click');
     addToCallendar(event);
   });
 }
