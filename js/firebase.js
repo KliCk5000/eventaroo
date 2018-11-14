@@ -87,7 +87,7 @@ function addToCallendar(event) {
       } else {
         gapi.auth2
           .getAuthInstance()
-          .signIn()
+          .signIn(calendarConfig)
           .then(function() {
             // Check to see if google has your authenitcation
             if (gapi.auth2.getAuthInstance().isSignedIn.get()) {
@@ -113,7 +113,7 @@ function addToCallendar(event) {
         } else {
           gapi.auth2
             .getAuthInstance()
-            .signIn()
+            .signIn(calendarConfig)
             .then(function() {
               // Check to see if google has your authenitcation
               if (gapi.auth2.getAuthInstance().isSignedIn.get()) {
