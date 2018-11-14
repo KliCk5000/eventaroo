@@ -4,16 +4,22 @@ Website to help users find events near them, based on price, and giving the abil
 
 ## Live site
 
-[Link to Eventaroo's live site](https://klick5000.github.io/eventaroo/)
+[Link to Eventaroo's live Github pages site](https://klick5000.github.io/eventaroo/)
 
-[Link to beta Eventaroo Surge development build](https://eventaroo.surge.sh)
+[Link to archived MVP version of Eventaroo - hosted on Surge](https://eventaroo-mvp.surge.sh)
+
+[Link to active beta Eventaroo Surge development build](https://eventaroo.surge.sh)
 
 ## Version MVP (Minimal Viable Product)
 
-![Image of MVP Title Screen](content/MVP-title.png "MVP title")
-![Image of MVP Results Screen](content/MVP-results-page.png "MVP results")
+### Image of MVP Title Screen
 
-## Wireframe image
+<img src="content/MVP-title.png" alt="Image of MVP Title Screen" width="300">
 
-![Image of Wireframe](content/20181101_170508.jpg "Wireframe")
+### Image of MVP Results Screen
 
+<img src="content/MVP-results-page.png" alt="Image of MVP Results Screen" width="900">
+
+### Wireframe image
+
+<img src="content/20181101_170508.jpg" alt="Wireframe" width="500">
