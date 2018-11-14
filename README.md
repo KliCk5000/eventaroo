@@ -23,3 +23,7 @@ Website to help users find events near them, based on price, and giving the abil
 ### Wireframe image
 
 <img src="content/20181101_170508.jpg" alt="Wireframe" width="500">
+
+## With a little bit of CSS
+
+<img src="content/Style-title.png" alt="Style Title" width="750">
