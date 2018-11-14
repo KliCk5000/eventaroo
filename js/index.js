@@ -53,6 +53,11 @@ function changeToResultPage(landingPageQuery) {
   $('.results-container').toggleClass('hidden');
   $('.js-signon-container').toggleClass('hidden');
 
+  // Remove the logo background-image
+  $('.banner').removeClass('background-image');
+  $('.banner').removeClass('banner-landing');
+  $('.banner').addClass('banner-results');
+
   // Update the logo to reflect the new screen
   $('.logo').removeClass('landing-logo');
   $('.logo').addClass('results-logo');
@@ -359,14 +364,18 @@ function displayResults(pageNumber, numOfResults) {
       <h2>
         <a href="${currentEvent.source.url}" target=”_blank”>${currentEvent.source.title}</a>
       </h2>
-      <img class="result-image" src="${currentEvent.logoUrl}" alt="${currentEvent.source.title}"/>
-      <p>Start time: ${currentEvent.start.dateTimeReadable}</p>
-      <p>End time: ${currentEvent.end.dateTimeReadable}</p>
-      <p class="js-event-location-name">Venue Name: ${currentEvent.location.name}</p>
-      <p class="js-event-location-address">Address: ${currentEvent.location.address.localized_address_display}</p>
-      <p class="js-event-price">Is free: ${currentEvent.is_free}</p>
+      <div class="result-image-container">
+        <img class="result-image" src="${currentEvent.logoUrl}" alt="${currentEvent.source.title}"/>
+        <input type="button" class="js-add-to-calendar" value="Add to Google Calendar">
+      </div>
+      <div class="result-info-container">
+        <p>Start time: ${currentEvent.start.dateTimeReadable}</p>
+        <p>End time: ${currentEvent.end.dateTimeReadable}</p>
+        <p class="js-event-location-name">Venue Name: ${currentEvent.location.name}</p>
+        <p class="js-event-location-address">Address: ${currentEvent.location.address.localized_address_display}</p>
+        <p class="js-event-price">Is free: ${currentEvent.is_free}</p>
+      </div>
       <p class="js-calendar-success"></p>
-      <input type="button" class="js-add-to-calendar" value="Add to Google Calendar">
       <div class="result-description small-description clearfix">
         ${currentEvent.description.html}
         <br/><br/>

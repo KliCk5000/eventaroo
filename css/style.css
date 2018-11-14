@@ -1,0 +1,331 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Kodchasan', sans-serif;
+  min-width: 300px;
+
+  background-image: linear-gradient(141deg,
+    rgb(44, 70, 83) 0,
+    rgb(27, 90, 110) 71%,
+    rgb(20, 103, 145) 100%);
+}
+
+body,
+html {
+  height: 100%;
+  /* overflow: hidden; */
+}
+
+.center {
+  margin: 0 auto;
+  text-align: center;
+}
+
+.hidden {
+  display: none;
+}
+
+.error {
+  color: rgb(255, 124, 85);
+}
+
+.banner-landing {
+  position: relative;
+  height: 50%;
+  margin-bottom: 30px;
+}
+
+.banner-results {
+  position: relative;
+  padding: 5px 0 15px;
+  background-color: #2C4653;
+}
+
+.background-image {
+  /* Center and scale the image nicely */
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.background-image:before {
+  content: ' ';
+  display: block;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  opacity: 0.8;
+  background-image: url("../content/seattle-medium.jpeg");
+  background-repeat: no-repeat;
+  background-position: 50% 0;
+  -ms-background-size: cover;
+  -o-background-size: cover;
+  -moz-background-size: cover;
+  -webkit-background-size: cover;
+  background-size: cover;
+}
+
+.logo {
+  font-family: 'Permanent Marker', cursive;
+  text-align: center;
+  z-index: 2;
+
+  color: #FFFFFF;
+  text-shadow: 0 1px 0 rgb(130, 130, 130),
+    0 2px 0 rgb(110, 110, 110),
+    0 3px 0 rgb(90, 90, 90),
+    0 4px 0 rgb(70, 70, 70),
+    0 5px 0 rgb(50, 50, 50),
+    0 6px 1px rgba(0, 0, 0, .1),
+    0 0 5px rgba(0, 0, 0, .1),
+    0 1px 3px rgba(0, 0, 0, .3),
+    0 3px 5px rgba(0, 0, 0, .2),
+    0 5px 10px rgba(0, 0, 0, .25),
+    0 10px 10px rgba(0, 0, 0, .2),
+    0 20px 20px rgba(0, 0, 0, .15);
+
+}
+
+.orange {
+  color: #F05833;
+}
+
+.landing-logo {
+  position: absolute;
+  font-size: 3.5em;
+  bottom: -25px;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+}
+
+.results-logo {
+  position: relative;
+  font-size: 2.5em;
+  margin: 0 auto;
+}
+
+input[type="text"] {
+  width: 145px;
+}
+
+.filter-results {
+  background-color: #F05833;
+}
+
+.form-line {
+  margin: 10px;
+}
+
+.landing-container {
+  color: white;
+}
+
+.find-events {
+  font-size: 1.25em;
+}
+
+footer {
+  position: absolute;
+  bottom: 0px;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  color: lightgray;
+  font-size: 0.75em;
+}
+
+footer a:link,
+footer a:visited {
+  color: lightgray;
+}
+
+.results-container {}
+
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+li {
+  display: inline-block;
+  white-space: nowrap;
+  margin: 10px 20px;
+}
+
+.pagination {
+  margin: 5px auto;
+}
+
+.pagination input[type="button"] {
+  width: 30%;
+}
+
+.js-signon-container {
+  margin: 10px;
+}
+
+/* Results */
+.result-listing {
+  padding: 15px;
+  margin: 10px;
+  overflow-wrap: break-word;
+  background-color: #E9DDC7;
+  border-radius: 20px;
+}
+
+.result-listing h2 {
+  margin: 4px auto;
+  text-align: center;
+}
+
+.result-description {
+  position: relative;
+  overflow: hidden;
+}
+
+.result-image-container {
+  position: relative;
+  width: 100%;
+  padding: 4px;
+}
+
+.js-add-to-calendar {
+  display: block;
+  width: 100%;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.result-image {
+  display: block;
+  width: 100%;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.result-info-container {
+  position: relative;
+  width: 100%;
+  padding: 4px;
+}
+
+.result-description .read-more {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  margin: 0;
+  padding: 30px 0;
+  /* "transparent" only works here because == rgba(0,0,0,0) */
+  background-image: linear-gradient(to bottom, transparent, lightgray);
+  font-weight: bold;
+  color: black;
+  cursor: pointer;
+}
+
+.clearfix::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+.small-description {
+  height: 200px;
+}
+
+.large-description {
+  height: auto;
+}
+
+
+
+/* To Top Button */
+#top-button {
+  display: none;
+  /* Hidden by default */
+  position: fixed;
+  /* Fixed/sticky position */
+  bottom: 20px;
+  /* Place the button at the bottom of the page */
+  right: 30px;
+  /* Place the button 30px from the right */
+  z-index: 99;
+  /* Make sure it does not overlap */
+  cursor: pointer;
+  /* Add a mouse pointer on hover */
+}
+
+#top-button:hover {
+  background-color: #555;
+  /* Add a dark-grey background on hover */
+}
+
+
+
+
+
+
+/* Small devices (portrait tablets and large phones, 600px and up) */
+@media only screen and (min-width: 600px) {
+  .banner {
+    background-color: lightgreen;
+  }
+
+  .landing-logo {
+    font-size: 4.25em;
+  }
+
+  .result-image-container {
+    width: 50%;
+    float: left;
+  }
+
+  .result-info-container {
+    width: 50%;
+    float: left;
+  }
+}
+
+/* Medium devices (landscape tablets, 768px and up) */
+@media only screen and (min-width: 768px) {
+  .banner {
+    background-color: green;
+  }
+
+  .landing-logo {
+    font-size: 5em;
+  }
+}
+
+/* Large devices (laptops/desktops, 992px and up) */
+@media only screen and (min-width: 992px) {
+  .banner {
+    background-color: lightblue;
+  }
+
+  .background-image:before {
+    background-image: url("../content/seattle-medium.jpeg");
+  }
+
+}
+
+/* Extra large devices (large laptops and desktops, 1200px and up) */
+@media only screen and (min-width: 1200px) {
+  .banner {
+    background-color: lightslategrey;
+  }
+
+  .landing-logo {
+    font-size: 8em;
+  }
+}

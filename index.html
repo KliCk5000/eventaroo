@@ -8,18 +8,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://fonts.googleapis.com/css?family=Kodchasan:400,500,700|Permanent+Marker" rel="stylesheet">
   <link rel="stylesheet" type="text/css" media="screen" href="css/normalize.css" />
-  <link rel="stylesheet" type="text/css" media="screen" href="css/index.css" />
+  <!-- <link rel="stylesheet" type="text/css" media="screen" href="css/index.css" /> -->
+  <link rel="stylesheet" type="text/css" media="screen" href="css/style.css" />
   <meta name="description" content="Eventaroo is the best place to find out what events are happening around you.">
 </head>
 
 <body>
   <!-- Header that will always show the logo -->
-  <header role="banner">
-    <div class="logo landing-logo">Eventaroo</div>
+  <header role="banner" class="banner banner-landing background-image">
+    <div class="logo landing-logo"><span class="orange">Event</span>aroo</div>
   </header>
 
   <!-- This section will output any errors that we recieve that the user needs to know about -->
-  <section role="region" class="js-error-output error">
+  <section role="region" class="js-error-output error center">
   </section>
 
   <!-- This is the Landing Page which is the first thing the user sees -->
@@ -31,7 +32,7 @@
       <div class="form-line">
         <label for="near-me"></label>
         <input type="button" name="near-me" class="js-near-me" value="Near me" />
-        <input type="text" name="location" class="js-location" placeholder="Denver, Co" required>
+        <input type="text" name="location" class="js-location" placeholder="Denver, Colorado" required>
         <input name="submit" type="submit" value="Go!">
       </div>
       <div class="form-line">
@@ -68,6 +69,11 @@
   </nav>
 
   <button onclick="topFunction()" id="top-button" class="top-button" value="Go to top">Back to top of page</button>
+
+  <footer role="contentinfo" class="center">
+    This project was made by Nick Dean and the source can be found <a href="https://github.com/KliCk5000/eventaroo">here
+      on Github</a>.
+  </footer>
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="https://www.gstatic.com/firebasejs/5.5.7/firebase-app.js"></script>
