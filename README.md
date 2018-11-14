@@ -26,4 +26,6 @@ Website to help users find events near them, based on price, and giving the abil
 
 ## With a little bit of CSS
 
+[Color theme](https://coolors.co/0e4d6c-f05833-e9ddc7-ffffff-2c4653)
+
 <img src="content/Style-title.png" alt="Style Title" width="750">
