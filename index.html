@@ -8,6 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://fonts.googleapis.com/css?family=Kodchasan:400,500,700|Permanent+Marker" rel="stylesheet">
   <link rel="stylesheet" type="text/css" media="screen" href="css/normalize.css" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
   <!-- <link rel="stylesheet" type="text/css" media="screen" href="css/index.css" /> -->
   <link rel="stylesheet" type="text/css" media="screen" href="css/style.css" />
   <meta name="description" content="Eventaroo is the best place to find out what events are happening around you.">
@@ -31,9 +32,9 @@
       </div>
       <div class="form-line">
         <label for="near-me"></label>
-        <input type="button" name="near-me" class="js-near-me" value="Near me" />
-        <input type="text" name="location" class="js-location" placeholder="Denver, Colorado" required>
-        <input name="submit" type="submit" value="Go!">
+        <button id="near-me" class="js-near-me"><i class="fas fa-map-marker-alt"></i></button>
+        <input type="text" name="location" class="js-location" id="my-location" placeholder="Denver, Colorado" required>
+        <input name="submit" class="submit-landing" type="submit" value="Go!">
       </div>
       <div class="form-line">
         <label for="free-mode" class="find-events">Show only free events</label>
@@ -52,7 +53,7 @@
     </div>
   </section>
 
-  <section role="region" class="filter-results">
+  <section role="region" class="filter-results hidden">
 
   </section>
 
@@ -71,8 +72,8 @@
   <button onclick="topFunction()" id="top-button" class="top-button" value="Go to top">Back to top of page</button>
 
   <footer role="contentinfo" class="center">
-    This project was made by Nick Dean and the source can be found <a href="https://github.com/KliCk5000/eventaroo">here
-      on Github</a>.
+    <p class="footer-credit">This project was made by Nick Dean and the source can be found <a href="https://github.com/KliCk5000/eventaroo">here
+      on Github</a>.</p>
   </footer>
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
