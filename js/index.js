@@ -2,8 +2,8 @@ const EVENTBRITE_TOKEN = "JRKAA3O73D" + "DJB47QH5OT";
 const FETCH_ADDITIONAL = true;
 const resultList = {
   currentPage: 0,
-  numberOfResults: 5,
-  events: [],
+  numberOfResults: 12,
+  events: []
 };
 
 /**
@@ -12,29 +12,38 @@ const resultList = {
  */
 function watchLandingPage() {
   // Submit Button on Landing Page
-  $('.landing-container').submit(event => {
+  $(".landing-container").submit(event => {
     event.preventDefault();
 
     // Check to see if user put in a location
     let userLocation;
 
     // If they did, we can send it to landingPageQuery below
-    if ($('.js-location').val()) {
-      userLocation = $('.js-location').val();
+    if ($(".js-location").val()) {
+      userLocation = $(".js-location").val();
     }
 
     let landingPageQuery = {
       location: userLocation, // Location the user wants to search
-      isFreeModeChecked: $('.js-free-mode').is(":checked"), // Did they check the free-mode box?
+      isFreeModeChecked: $(".js-free-mode").is(":checked") // Did they check the free-mode box?
     };
 
     changeToResultPage(landingPageQuery);
   });
 
   // Near me Button on Landing Page
-  $('.landing-container').on('click', '.js-near-me', event => {
+  $(".landing-container").on("click", ".js-near-me", event => {
+    event.preventDefault();
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(geoSuccess, geoError);
+    }
+  });
+
+  $(".js-location").keypress(function(event) {
+    if (event.which == 13) {
+      // User presses enter on form
+      event.preventDefault();
+      $(".js-form").submit();
     }
   });
 }
@@ -47,24 +56,33 @@ function watchLandingPage() {
  */
 function changeToResultPage(landingPageQuery) {
   // Remove the landing page
-  $('.landing-container').empty();
+  $(".landing-container").empty();
+
+  $("html").height("auto");
+  $("body").height("auto");
 
   // Unhide the results container
-  $('.results-container').toggleClass('hidden');
-  $('.js-signon-container').toggleClass('hidden');
+  $(".results-container").toggleClass("hidden");
+  $(".js-signon-container").toggleClass("hidden");
+
+  // Remove the logo background-image
+  $(".banner").removeClass("background-image");
+  $(".banner").removeClass("banner-landing");
+  $(".banner").addClass("banner-results");
 
   // Update the logo to reflect the new screen
-  $('.logo').removeClass('landing-logo');
-  $('.logo').addClass('results-logo');
+  $(".logo").removeClass("landing-logo");
+  $(".logo").addClass("results-logo");
 
   // Send the landingPageQuery that we got from the landing page and
   // make the API request which will display the data on the results
   // page.
   const queryParams = {
-    'location.address': landingPageQuery.location,
-    'location.within': '10mi',
-    price: (landingPageQuery.isFreeModeChecked ? 'free' : 'paid'),
-  }
+    "location.address": landingPageQuery.location,
+    "location.within": "10mi",
+    sort_by: "date",
+    price: landingPageQuery.isFreeModeChecked ? "free" : "paid"
+  };
   fetchEventbriteData(queryParams);
 
   // Show the Results Filter Header to let the user change their query
@@ -87,9 +105,9 @@ function changeToResultPage(landingPageQuery) {
  */
 function loadResultsPage() {
   // For now, just show a 'loading' screen
-  $('.results-container').append(
+  $(".results-container").append(
     `<p class="loading center">Loading.........</p>`
-  )
+  );
 }
 
 /**
@@ -122,7 +140,7 @@ function fetchEventbriteData(queryParams) {
       processResults(responseJson);
     })
     .catch(err => {
-      $('.js-error-output').text(`Something went wrong: ${err.message}`);
+      $(".js-error-output").text(`Something went wrong: ${err.message}`);
     });
 }
 
@@ -140,37 +158,55 @@ function fetchLocationOfEventBriteData(eventId, venueId) {
       setLocationOfEventBriteData(responseJson, eventId, venueId);
     })
     .catch(err => {
-      $('.js-error.output').text(`Something went wrong with location: ${err.message}`);
+      $(".js-error.output").text(
+        `Something went wrong with location: ${err.message}`
+      );
     });
 }
 
 function setLocationOfEventBriteData(responseJson, eventId, venueId) {
   // Quickly process the result
   const location = {
-    'name': responseJson.name,
-    'venue_id': venueId,
-    'address': {
-      'localized_address_display': responseJson.address.localized_address_display,
-      'localized_multi_line_address_display': responseJson.address.localized_multi_line_address_display,
+    name: responseJson.name,
+    venue_id: venueId,
+    address: {
+      localized_address_display: responseJson.address.localized_address_display,
+      localized_multi_line_address_display:
+        responseJson.address.localized_multi_line_address_display
     },
-    'latitude': responseJson.latitude,
-    'longitude': responseJson.longitude,
-  }
+    latitude: responseJson.latitude,
+    longitude: responseJson.longitude
+  };
   // Put the location into the event list
-  let eventIndex = resultList.events.findIndex(element => element.id === eventId);
+  let eventIndex = resultList.events.findIndex(
+    element => element.id === eventId
+  );
   resultList.events[eventIndex].location = location;
 
   // Try to update location of the event on screen
-  $(`#${resultList.events[eventIndex].id}`).find('.js-event-location-name').text(`Venue Name: ${resultList.events[eventIndex].location.name}`);
-  $(`#${resultList.events[eventIndex].id}`).find('.js-event-location-address').text(`Address: ${resultList.events[eventIndex].location.address.localized_address_display}`);
+  $(`#${resultList.events[eventIndex].id}`)
+    .find(".js-event-location-name")
+    .text(`Venue Name: ${resultList.events[eventIndex].location.name}`);
+  $(`#${resultList.events[eventIndex].id}`)
+    .find(".js-event-location-address")
+    .text(
+      `Address: ${
+        resultList.events[eventIndex].location.address.localized_address_display
+      }`
+    );
 
-  if (resultList.events[eventIndex].location.address.localized_address_display === null) {
-    $(`#${resultList.events[eventIndex].id}`).find('.js-event-location').text(`Location: Somewhere far far away...`);
+  if (
+    resultList.events[eventIndex].location.address.localized_address_display ===
+    null
+  ) {
+    $(`#${resultList.events[eventIndex].id}`)
+      .find(".js-event-location")
+      .text(`Location: Somewhere far far away...`);
   }
 }
 
 function fetchCostOfEventBriteData(eventId) {
-  const url = `https://www.eventbriteapi.com/v3/events/${eventId}/ticket_classes/?token=${EVENTBRITE_TOKEN}`
+  const url = `https://www.eventbriteapi.com/v3/events/${eventId}/ticket_classes/?token=${EVENTBRITE_TOKEN}`;
 
   fetch(url)
     .then(response => {
@@ -183,13 +219,15 @@ function fetchCostOfEventBriteData(eventId) {
       setCostOfEventBriteData(responseJson, eventId);
     })
     .catch(err => {
-      $('.js-error.output').text(`Something went wrong with price: ${err.message}`);
+      $(".js-error.output").text(
+        `Something went wrong with price: ${err.message}`
+      );
     });
 }
 
 function setCostOfEventBriteData(responseJson, eventId) {
   // Each event can have more than one price
-  const costArray = new Array;
+  const costArray = new Array();
   for (const ticket of responseJson.ticket_classes) {
     if (ticket.cost) {
       // if it has a cost add it,
@@ -197,37 +235,40 @@ function setCostOfEventBriteData(responseJson, eventId) {
     } else {
       // else give it a blank value;
       costArray.push({
-        "display": "Unknown",
-        "currency": "USD",
-        "value": 0,
-        "major_value": "0.00"
+        display: "Unknown",
+        currency: "USD",
+        value: 0,
+        major_value: "0.00"
       });
     }
   }
 
   // Take an array of just the values
-  const costValuesArray = new Array;
+  const costValuesArray = new Array();
   for (const cost of costArray) {
     costValuesArray.push(parseFloat(cost.major_value) / 100);
   }
 
-  costValuesArray.sort(function (a, b) {
+  costValuesArray.sort(function(a, b) {
     return a - b;
   });
 
-
   // TODO: refactor this conversion
-  priceRange = `Min: ${costValuesArray[0]} Max: ${costValuesArray[costValuesArray.length-1]}`;
-
-
+  priceRange = `Min: ${costValuesArray[0]} Max: ${
+    costValuesArray[costValuesArray.length - 1]
+  }`;
 
   // Put the cost into the event list
-  let eventIndex = resultList.events.findIndex(element => element.id === eventId);
+  let eventIndex = resultList.events.findIndex(
+    element => element.id === eventId
+  );
   resultList.events[eventIndex].costData = costArray;
   resultList.events[eventIndex].costData.priceRange = priceRange;
 
   // Try to update cost of the event on screen
-  $(`#${resultList.events[eventIndex].id}`).find('.js-event-price').text(`Prices: ${priceRange}`);
+  $(`#${resultList.events[eventIndex].id}`)
+    .find(".js-event-price")
+    .text(`Prices: ${priceRange}`);
 }
 
 /**
@@ -236,9 +277,10 @@ function setCostOfEventBriteData(responseJson, eventId) {
  * ?location.address=Denver%2C%20co&location.within=10mi&price=free
  */
 function formatQueryParams(params) {
-  const queryItems = Object.keys(params)
-    .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`);
-  return queryItems.join('&');
+  const queryItems = Object.keys(params).map(
+    key => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`
+  );
+  return queryItems.join("&");
 }
 
 function processResults(responseJson) {
@@ -250,12 +292,12 @@ function processResults(responseJson) {
 
   // Setup code for Date and time
   const dateOptions = {
-    weekday: 'long',
-    month: 'long',
-    day: 'numeric',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit"
   };
 
   // Things I need:
@@ -275,60 +317,65 @@ function processResults(responseJson) {
   for (const event of eventArray) {
     // Translate date/time
     let startDateTime = new Date(
-      (event.start.local != null ? event.start.local : 'Unknown')
+      event.start.local != null ? event.start.local : "Unknown"
     );
-    startDateTime = startDateTime.toLocaleDateString('en-US', dateOptions)
+    startDateTime = startDateTime.toLocaleDateString("en-US", dateOptions);
     let endDateTime = new Date(
-      (event.end.local != null ? event.end.local : 'Unknown')
+      event.end.local != null ? event.end.local : "Unknown"
     );
-    endDateTime = endDateTime.toLocaleDateString('en-US', dateOptions);
+    endDateTime = endDateTime.toLocaleDateString("en-US", dateOptions);
 
     // Go fetch some additional stuff we need
     if (FETCH_ADDITIONAL) {
       fetchLocationOfEventBriteData(event.id, event.venue_id);
       if (event.is_free === false) {
         // fetchCostOfEventBriteData(event.id);
-      };
+      }
     }
-
 
     // Create the event entry
     const currentEvent = {
-      'id': (event.id ? event.id : 999),
-      'venue_id': (event.venue_id ? event.venue_id : 'Unknown'),
-      'summary': (event.name.text != null ? event.name.text : 'Unknown'),
-      'location': {
+      id: event.id ? event.id : 999,
+      venue_id: event.venue_id ? event.venue_id : "Unknown",
+      summary: event.name.text != null ? event.name.text : "Unknown",
+      location: {
         address: {
-          localized_address_display: '',
-          localized_multi_line_address_display: '',
+          localized_address_display: "",
+          localized_multi_line_address_display: ""
         },
-        latitude: '',
-        longitude: '',
-        name: '',
-        venu_id: '',
+        latitude: "",
+        longitude: "",
+        name: "",
+        venu_id: ""
       },
-      'is_free': event.is_free,
-      'cost': '...loading...',
-      'costData': '',
-      'priceRange': '...loading...',
-      'description': {
-        'html': (event.description.html != null ? event.description.html : 'Unknown'),
-        'text': (event.description.text != null ? event.description.text : 'Unknown'),
+      is_free: event.is_free,
+      cost: "...loading...",
+      costData: "",
+      priceRange: "...loading...",
+      description: {
+        html:
+          event.description.html != null ? event.description.html : "Unknown",
+        text:
+          event.description.text != null ? event.description.text : "Unknown"
       },
-      'source': {
-        'title': (event.name.text != null ? event.name.text : 'Unknown'),
-        'url': (event.url != null ? event.url : 'Unknown'),
+      source: {
+        title: event.name.text != null ? event.name.text : "Unknown",
+        url: event.url != null ? event.url : "Unknown"
       },
-      'logoUrl': (event.logo != null ? event.logo.url : 'https://picsum.photos/400/200?blur'),
-      'start': {
-        'dateTimeCode': (event.start.local != null ? event.start.local : 'Unknown'),
-        'dateTimeReadable': startDateTime,
-        'timeZone': (event.start.timezone != null ? event.start.timezone : 'Unknown'),
+      logoUrl:
+        event.logo != null
+          ? event.logo.url
+          : "https://picsum.photos/400/200?blur",
+      start: {
+        dateTimeCode: event.start.local != null ? event.start.local : "Unknown",
+        dateTimeReadable: startDateTime,
+        timeZone:
+          event.start.timezone != null ? event.start.timezone : "Unknown"
       },
-      'end': {
-        'dateTimeCode': (event.end.local != null ? event.end.local : 'Unknown'),
-        'dateTimeReadable': endDateTime,
-        'timeZone': (event.end.timezone != null ? event.end.timezone : 'Unknown'),
+      end: {
+        dateTimeCode: event.end.local != null ? event.end.local : "Unknown",
+        dateTimeReadable: endDateTime,
+        timeZone: event.end.timezone != null ? event.end.timezone : "Unknown"
       }
     };
 
@@ -337,46 +384,97 @@ function processResults(responseJson) {
 
   displayResults(resultList.currentPage, resultList.numberOfResults);
   console.log(resultList);
-
 }
 
 function displayResults(pageNumber, numOfResults) {
-  $('.loading').empty();
+  $(".loading").empty();
 
-  $('.pagination').html(`
+  $(".pagination").html(`
     <input type="button" class="js-page-previous" value="&laquo;" href="#pagination-top">
     <input type="button" class="js-page-next" value="&raquo;" href="#pagination-top">
   `);
 
-  $('.results-container').empty();
+  $(".results-container").empty();
 
   let firstIndex = pageNumber * numOfResults;
 
-  for (let i = firstIndex; i < resultList.events.length && i < firstIndex + numOfResults; i++) {
+  for (
+    let i = firstIndex;
+    i < resultList.events.length && i < firstIndex + numOfResults;
+    i++
+  ) {
     let currentEvent = resultList.events[i];
-    $('.results-container').append(`
-    <div id="${currentEvent.id}" class="result-listing clearfix">
-      <h2>
-        <a href="${currentEvent.source.url}" target=”_blank”>${currentEvent.source.title}</a>
-      </h2>
-      <img class="result-image" src="${currentEvent.logoUrl}" alt="${currentEvent.source.title}"/>
-      <p>Start time: ${currentEvent.start.dateTimeReadable}</p>
-      <p>End time: ${currentEvent.end.dateTimeReadable}</p>
-      <p class="js-event-location-name">Venue Name: ${currentEvent.location.name}</p>
-      <p class="js-event-location-address">Address: ${currentEvent.location.address.localized_address_display}</p>
-      <p class="js-event-price">Is free: ${currentEvent.is_free}</p>
-      <p class="js-calendar-success"></p>
-      <input type="button" class="js-add-to-calendar" value="Add to Google Calendar">
-      <div class="result-description small-description clearfix">
-        ${currentEvent.description.html}
-        <br/><br/>
-        <a class="read-more description-button read-text">Read More...</a>
+
+    // Get Month and day from currentEvent.start.dateTimeCode
+    let currentDate = new Date(currentEvent.start.dateTimeCode);
+    $(".results-container").append(`
+    <div id="${currentEvent.id}" class="result-listing">
+    <div class="result-image-container">
+      <img
+        class="result-image"
+        src="${currentEvent.logoUrl}"
+        alt="${currentEvent.source.title}"
+      />
+      <div class="js-event-price">Unknown</div>
+    </div>
+    <div class="result-details">
+      <div class="result-details-time">
+        <div class="flip-card">
+          <div class="flip-card-inner">
+            <div class="">
+              <div class="calendar-icon flip-card-front">
+                <div class="calendar-icon-month">
+                  <p>
+                    ${currentDate.toLocaleString("en-us", { month: "short" })}
+                  </p>
+                </div>
+                <div class="calendar-icon-day">
+                  <p>${currentDate.getDate()}</p>
+                </div>
+              </div>
+            </div>
+            <div class="flip-card-back">
+              <p class="js-calendar-success"></p>
+              <button class="js-add-to-calendar">
+                <i class="far fa-calendar-plus"></i>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>`);
+  
+      <div class="result-details-content">
+        <h2>
+          <a href="${currentEvent.source.url}" target="_blank"
+            >${currentEvent.source.title}</a
+          >
+        </h2>
+        <p>${currentEvent.start.dateTimeReadable}</p>
+        <p>${currentEvent.end.dateTimeReadable}</p>
+        <p class="js-event-location-name">${currentEvent.location.name}</p>
+        <p class="js-event-location-address">
+          ${currentEvent.location.address.localized_address_display}
+        </p>
+      </div>
+    </div>
+    <div class="result-more-description"></div>
+    <div class="result-more-info">
+      <p class="open-description">Click here for description</p>
+    </div>
+  </div>
+  `);
+
+    if (currentEvent.is_free) {
+      $(".js-event-price").html('<span class="free-event">Free</span>');
+    } else {
+      $(".js-event-price").html(
+        '<i class="fas fa-dollar-sign paid-event"></i>'
+      );
+    }
 
     // Remove any unwanted tags
-    $('.result-description img').remove();
-    $('.result-description object').remove();
+    $(".result-description img").remove();
+    $(".result-description object").remove();
   }
 }
 
@@ -385,16 +483,64 @@ function displayResults(pageNumber, numOfResults) {
  * This is for the "read more" button that appears on the bottom of each event result
  */
 function watchDescriptionButtons() {
-  $('.results-container').on('click', '.description-button', event => {
-    event.preventDefault();
-    // Once clicked, toggle between the two modes
-    $(event.target).parent().toggleClass('small-description large-description');
-    // Change the text depending on which is displayed
-    if ($(event.target).parent().hasClass('large-description')) {
-      $(event.target).text('Colapse Description');
+  $(".results-container").on("click", ".result-more-info", event => {
+    // First we need to find what event target we clicked on and find its Event Index
+    const eventId = $(event.target)
+      .parent()
+      .parent()
+      .attr("id");
+    let eventIndex = resultList.events.findIndex(
+      element => element.id === eventId
+    );
+
+    if (
+      $(`#${resultList.events[eventIndex].id}`)
+        .find(".result-more-info p")
+        .hasClass("open-description")
+    ) {
+      // First close all other descriptions
+      $(".result-more-description").empty();
+      $(".result-listing").css("flex-basis", "0");
+      $(".result-more-info").html(
+        '<p class="open-description">Click here for description<p>'
+      );
+
+      // Here we can add the description
+      $(`#${resultList.events[eventIndex].id}`)
+        .find(".result-more-description")
+        .append(resultList.events[eventIndex].description.html);
+
+      // Oh no! We need to get rid of the images and objects
+      $(".result-more-description img").remove();
+      $(".result-more-description object").remove();
+
+      // Allow the result to grow big and stong
+      $(`#${resultList.events[eventIndex].id}`).css("flex-basis", "100%");
+
+      // Change the "Close description" text
+      $(`#${resultList.events[eventIndex].id}`)
+        .find(".result-more-info")
+        .html('<p class="close-description">Close description<p>');
+
+      // Scroll User's view
+      let ele = $(`#${resultList.events[eventIndex].id}`)[0];
+      ele.scrollIntoView(true);
     } else {
-      $(event.target).text('...Read More...');
-      let ele = $(event.target).closest('.result-listing')[0];
+      // Empty the description
+      $(`#${resultList.events[eventIndex].id}`)
+        .find(".result-more-description")
+        .empty();
+
+      // Remove the flex growth
+      $(`#${resultList.events[eventIndex].id}`).css("flex-basis", "0");
+
+      // Change the "Click here for description" text
+      $(`#${resultList.events[eventIndex].id}`)
+        .find(".result-more-info")
+        .html('<p class="open-description">Click here for description<p>');
+
+      // Scroll User's view
+      let ele = $(`#${resultList.events[eventIndex].id}`)[0];
       ele.scrollIntoView(true);
     }
   });
@@ -405,79 +551,88 @@ function watchDescriptionButtons() {
  * Event listeners for each button on the page
  */
 function watchPageButtons() {
-  $('#pagination-top').on('click', event => {
+  $("#pagination-top").on("click", event => {
     event.preventDefault();
 
-    if ($(event.target).hasClass('js-page-previous')) {
+    if ($(event.target).hasClass("js-page-previous")) {
       if (resultList.currentPage > 0) {
         resultList.currentPage--;
-      };
+      }
       displayResults(resultList.currentPage, resultList.numberOfResults);
-    } else if ($(event.target).hasClass('js-page-next')) {
-      if (resultList.currentPage <= (resultList.events.length / resultList.numberOfResults) - 1) {
+    } else if ($(event.target).hasClass("js-page-next")) {
+      if (
+        resultList.currentPage <=
+        resultList.events.length / resultList.numberOfResults - 1
+      ) {
         resultList.currentPage++;
-      };
+      }
       displayResults(resultList.currentPage, resultList.numberOfResults);
     }
-  })
+  });
 
-  $('#pagination-bottom').on('click', event => {
+  $("#pagination-bottom").on("click", event => {
     event.preventDefault();
 
-    if ($(event.target).hasClass('js-page-previous')) {
+    if ($(event.target).hasClass("js-page-previous")) {
       if (resultList.currentPage > 0) {
         resultList.currentPage--;
-      };
+      }
       displayResults(resultList.currentPage, resultList.numberOfResults);
-      document.getElementById("pagination-top").scrollIntoView();
-    } else if ($(event.target).hasClass('js-page-next')) {
-      if (resultList.currentPage <= (resultList.events.length / resultList.numberOfResults) - 1) {
+      document.getElementById("filter-form").scrollIntoView();
+    } else if ($(event.target).hasClass("js-page-next")) {
+      if (
+        resultList.currentPage <=
+        resultList.events.length / resultList.numberOfResults - 1
+      ) {
         resultList.currentPage++;
-      };
+      }
       displayResults(resultList.currentPage, resultList.numberOfResults);
-      document.getElementById("pagination-top").scrollIntoView();
+      document.getElementById("filter-form").scrollIntoView();
     }
-  })
-
+  });
 }
 
 function watchAddToCalendarButton() {
-  $('.results-container').on('click', '.js-add-to-calendar', event => {
+  $(".results-container").on("click", ".js-add-to-calendar", event => {
     event.preventDefault();
     addToCallendar(event);
   });
 }
 
 function insertGoogleEvent(eventIndex) {
-  const calId = 'primary';
+  const calId = "primary";
   const calendarEvent = {
-    'start': {
-      'dateTime': resultList.events[eventIndex].start.dateTimeCode,
-      'timeZone': resultList.events[eventIndex].start.timeZone,
+    start: {
+      dateTime: resultList.events[eventIndex].start.dateTimeCode,
+      timeZone: resultList.events[eventIndex].start.timeZone
     },
-    'end': {
-      'dateTime': resultList.events[eventIndex].end.dateTimeCode,
-      'timeZone': resultList.events[eventIndex].end.timeZone,
+    end: {
+      dateTime: resultList.events[eventIndex].end.dateTimeCode,
+      timeZone: resultList.events[eventIndex].end.timeZone
     },
     summary: resultList.events[eventIndex].source.title,
     description: resultList.events[eventIndex].description.text,
-    location: resultList.events[eventIndex].location.address.localized_address_display,
-  }
+    location:
+      resultList.events[eventIndex].location.address.localized_address_display
+  };
 
-  gapi.client.calendar.events.insert({
-      'calendarId': calId,
-      'resource': calendarEvent,
+  gapi.client.calendar.events
+    .insert({
+      calendarId: calId,
+      resource: calendarEvent
     })
-    .then(function (response) {
+    .then(function(response) {
       console.log(response);
       if (response.status === 200) {
-        $(`#${resultList.events[eventIndex].id}`).find('.js-calendar-success').text('Successfully added to Calendar!');
+        $(`#${resultList.events[eventIndex].id}`)
+          .find(".js-calendar-success")
+          .text("Successfully added to Calendar!");
       } else {
-        $(`#${resultList.events[eventIndex].id}`).find('.js-calendar-success').text('Unfortunately, something bad happened.');
+        $(`#${resultList.events[eventIndex].id}`)
+          .find(".js-calendar-success")
+          .text("Unfortunately, something bad happened.");
       }
     });
-
-
 }
 
 /**
@@ -485,43 +640,43 @@ function insertGoogleEvent(eventIndex) {
  * Show the filter header at the top of the page
  */
 function addResultsFilterHeader(previousQuery) {
-  $('.filter-results').html(`
-  <div class="results-filter center">
-    <form class="js-form">
-      <ul>
+  $(".filter-results").removeClass("hidden");
+  $(".filter-results").html(`
+    <form id="filter-form" class="js-form">
+      <ul class="filter-list">
+
         <li class="form-line">
           <label for="location">Search another location: </label>
           <input type="text" name="location" class="js-location" placeholder="Denver, Co">
-        </li>
-        <li class="form-line">
           <label for="query">Search term: </label>
           <input type="text" name="query" class="js-query" placeholder="Entertainment">
+          <input name="filter" type="submit" value="Go!">
         </li>
-        <li class="form-line">
+
+
+        <li id="free-mode" class="form-line">
           <label for="free-mode">Show only free events</label>
           <input type="checkbox" name="free-mode" class="js-free-mode">
         </li>
-        <li class="form-line">
+
+        <li id="sort-by" class="form-line">
           <label for="sort-by">Sort by: </label>
           <select name="sort-by" class="js-sort-by">
-              <option value="best">Highest rated</option>
-              <option value="-best">Lowest rated</option>
               <option value="date">Soonest</option>
               <option value="-date">Latest</option>
+              <option value="best">Highest rated</option>
+              <option value="-best">Lowest rated</option>
               <option value="distance">Nearest</option>
               <option value="-distance">Furthest</option>
             </select>
         </li>
-        <li class="form-line">
-          <input name="filter" type="submit" value="Go!">
-        </li>
+
       </ul>
     </form>
-  </div>
   `);
 
-  $('.js-location').val(previousQuery.location);
-  $('.js-free-mode').prop('checked', previousQuery.isFreeModeChecked);
+  $(".js-location").val(previousQuery.location);
+  $(".js-free-mode").prop("checked", previousQuery.isFreeModeChecked);
 }
 
 /**
@@ -529,47 +684,47 @@ function addResultsFilterHeader(previousQuery) {
  * Event handler that listens for the "submit" from the filter header on the results page
  */
 function watchResultsPage() {
-  $('.filter-results').submit(event => {
+  $(".filter-results").submit(event => {
     event.preventDefault();
 
     // Create the query based on what the user put
     const resultQuery = {
-      'location.address': $('.js-location').val(),
-      q: $('.js-query').val(),
-      'location.within': '10mi',
-      sort_by: $('.js-sort-by').val(),
-      price: ($('.js-free-mode').is(":checked") ? 'free' : 'paid'),
+      "location.address": $(".js-location").val(),
+      q: $(".js-query").val(),
+      "location.within": "10mi",
+      sort_by: $(".js-sort-by").val(),
+      price: $(".js-free-mode").is(":checked") ? "free" : "paid"
     };
 
     // Grab the previous values so you can update the next screen
-    let isChecked = $('.js-free-mode').is(":checked");
-    let previousLocation = $('.js-location').val();
+    let isChecked = $(".js-free-mode").is(":checked");
+    let previousLocation = $(".js-location").val();
 
     // Fetch the eventbrite data
     fetchEventbriteData(resultQuery);
 
     // Empty the results container
-    $('.results-container').empty();
+    $(".results-container").empty();
     addResultsFilterHeader(previousLocation);
 
     // Update header with previous info that we grabed above
     if (resultQuery["location.address"].val !== null) {
-      $('.js-location').val(resultQuery["location.address"]);
+      $(".js-location").val(resultQuery["location.address"]);
     }
     if (resultQuery.q.val !== null) {
-      $('.js-query').val(resultQuery.q);
+      $(".js-query").val(resultQuery.q);
     }
-    $('.js-sort-by').val(resultQuery.sort_by);
-    $('.js-free-mode').prop('checked', isChecked);
+    $(".js-sort-by").val(resultQuery.sort_by);
+    $(".js-free-mode").prop("checked", isChecked);
 
     // Finally, initialize the Results page (show loading...) until results come in
     loadResultsPage();
-  })
+  });
 }
 
 // When the user scrolls down 20px from the top of the document, show the button
-window.onscroll = function () {
-  scrollFunction()
+window.onscroll = function() {
+  scrollFunction();
 };
 
 function scrollFunction() {

@@ -1,0 +1,54 @@
+<div id="${currentEvent.id}" class="result-listing">
+  <div class="result-image-container">
+    <img
+      class="result-image"
+      src="${currentEvent.logoUrl}"
+      alt="${currentEvent.source.title}"
+    />
+    <div class="js-event-price">Free: ${currentEvent.is_free}</div>
+  </div>
+  <div class="result-details">
+    <div class="result-details-time">
+      <div class="flip-card">
+        <div class="flip-card-inner">
+          <div class="">
+            <div class="calendar-icon flip-card-front">
+              <div class="calendar-icon-month">
+                <p>
+                  ${currentDate.toLocaleString( "en-us", { month: "short" } )}
+                </p>
+              </div>
+              <div class="calendar-icon-day">
+                <p>${currentDate.getDate()}</p>
+              </div>
+            </div>
+          </div>
+          <div class="flip-card-back">
+            <p class="js-calendar-success"></p>
+            <button class="js-add-to-calendar">
+              <i class="far fa-calendar-plus"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="result-details-content">
+      <h2>
+        <a href="${currentEvent.source.url}" target="_blank"
+          >${currentEvent.source.title}</a
+        >
+      </h2>
+      <p>${currentEvent.start.dateTimeReadable}</p>
+      <p>${currentEvent.end.dateTimeReadable}</p>
+      <p class="js-event-location-name">${currentEvent.location.name}</p>
+      <p class="js-event-location-address">
+        ${currentEvent.location.address.localized_address_display}
+      </p>
+    </div>
+  </div>
+  <div class="result-more-description"></div>
+  <div class="result-more-info">
+    <p class="open-description">Click for description</p>
+  </div>
+</div>

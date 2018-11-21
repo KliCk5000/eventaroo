@@ -29,3 +29,22 @@ Website to help users find events near them, based on price, and giving the abil
 [Color theme](https://coolors.co/0e4d6c-f05833-e9ddc7-ffffff-2c4653)
 
 <img src="content/Style-title.png" alt="Style Title" width="750">
+
+TODO
+[x] Add spacing on either side of the screen on results. 50px on results listing div.
+
+[x] Figure out description how to resize the result containers
+
+[x] Buttons for pagination need to be smaller, arrow icon
+
+[x] seperate search another location and the other terms.
+
+[ ] make the filter buttons submit when changed
+
+[x] Float left the title and float right the Log in with google.
+
+[x] fix pagination spacing on the bottom.
+
+Optional tasks:
+
+[ ] add page numbers to Pagination
