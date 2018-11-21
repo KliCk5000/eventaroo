@@ -16,8 +16,14 @@
 
 <body>
   <!-- Header that will always show the logo -->
-  <header role="banner" class="banner banner-landing background-image">
+  <header role="banner" class="banner banner-landing background-image clearfix">
     <div class="logo landing-logo"><span class="orange">Event</span>aroo</div>
+    <!-- This is an area where the user can easily log out of Google using OAuth2 -->
+    <div id="firebaseui-auth-container" class="js-signon-container hidden">
+      <span class="username"></span>
+      <input type="button" name="google-sign-in" class="js-google-sign-in" value="Log in with Google">
+      <input type="button" name="log-out" class="js-log-out" value="Log out">
+    </div>
   </header>
 
   <!-- This section will output any errors that we recieve that the user needs to know about -->
@@ -44,20 +50,12 @@
     </form>
   </section>
 
-  <!-- This is an area where the user can easily log out of Google using OAuth2 -->
-  <section role="region" class="firebase-auth">
-    <div id="firebaseui-auth-container" class="js-signon-container center hidden">
-      <span class="username"></span>
-      <input type="button" name="google-sign-in" class="js-google-sign-in" value="Log in with Google">
-      <input type="button" name="log-out" class="js-log-out" value="Log out">
-    </div>
-  </section>
 
   <section role="region" class="filter-results hidden">
 
   </section>
 
-  <nav role="navigation" id="pagination-top" class="pagination center">
+  <nav role="navigation" id="pagination-top" class="pagination center hidden">
 
   </nav>
 

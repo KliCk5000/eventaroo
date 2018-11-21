@@ -1,8 +1,3 @@
-<!--
-  result-listing = result-card
-  result-image-container = result-image
--->
-
 <div id="${currentEvent.id}" class="result-listing">
   <div class="result-image-container">
     <img
@@ -10,9 +5,6 @@
       src="${currentEvent.logoUrl}"
       alt="${currentEvent.source.title}"
     />
-  </div>
-  <div class="result-extras">
-    <div>Calandar</div>
     <div class="js-event-price">Free: ${currentEvent.is_free}</div>
   </div>
   <div class="result-details">
@@ -20,9 +12,15 @@
       <div class="flip-card">
         <div class="flip-card-inner">
           <div class="">
-            <div class="flip-card-front">
-              <div class="calendar-icon-month"><p>Dec</p></div>
-              <div class="calendar-icon-day"><p>1</p></div>
+            <div class="calendar-icon flip-card-front">
+              <div class="calendar-icon-month">
+                <p>
+                  ${currentDate.toLocaleString( "en-us", { month: "short" } )}
+                </p>
+              </div>
+              <div class="calendar-icon-day">
+                <p>${currentDate.getDate()}</p>
+              </div>
             </div>
           </div>
           <div class="flip-card-back">
@@ -49,43 +47,8 @@
       </p>
     </div>
   </div>
-  <div class="result-more-info"><p>click for description</p></div>
-</div>
-
-<!-- BEFORE -->
-<div id="${currentEvent.id}" class="result-listing clearfix">
-  <h2>
-    <a href="${currentEvent.source.url}" target="”_blank”"
-      >${currentEvent.source.title}</a
-    >
-  </h2>
-  <div class="result-image-container">
-    <img
-      class="result-image"
-      src="${currentEvent.logoUrl}"
-      alt="${currentEvent.source.title}"
-    />
-    <input
-      type="button"
-      class="js-add-to-calendar"
-      value="Add to Google Calendar"
-    />
-  </div>
-  <div class="result-info-container">
-    <p>Start time: ${currentEvent.start.dateTimeReadable}</p>
-    <p>End time: ${currentEvent.end.dateTimeReadable}</p>
-    <p class="js-event-location-name">
-      Venue Name: ${currentEvent.location.name}
-    </p>
-    <p class="js-event-location-address">
-      Address: ${currentEvent.location.address.localized_address_display}
-    </p>
-    <p class="js-event-price">Is free: ${currentEvent.is_free}</p>
-  </div>
-  <p class="js-calendar-success"></p>
-  <div class="result-description small-description clearfix">
-    ${currentEvent.description.html} <br /><br />
-    <a class="read-more description-button read-text">Read More...</a>
+  <div class="result-more-description"></div>
+  <div class="result-more-info">
+    <p class="open-description">Click for description</p>
   </div>
 </div>
-`

@@ -2,7 +2,7 @@ const EVENTBRITE_TOKEN = "JRKAA3O73D" + "DJB47QH5OT";
 const FETCH_ADDITIONAL = true;
 const resultList = {
   currentPage: 0,
-  numberOfResults: 50,
+  numberOfResults: 12,
   events: []
 };
 
@@ -36,6 +36,14 @@ function watchLandingPage() {
     event.preventDefault();
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(geoSuccess, geoError);
+    }
+  });
+
+  $(".js-location").keypress(function(event) {
+    if (event.which == 13) {
+      // User presses enter on form
+      event.preventDefault();
+      $(".js-form").submit();
     }
   });
 }
@@ -72,6 +80,7 @@ function changeToResultPage(landingPageQuery) {
   const queryParams = {
     "location.address": landingPageQuery.location,
     "location.within": "10mi",
+    sort_by: "date",
     price: landingPageQuery.isFreeModeChecked ? "free" : "paid"
   };
   fetchEventbriteData(queryParams);
@@ -395,56 +404,73 @@ function displayResults(pageNumber, numOfResults) {
     i++
   ) {
     let currentEvent = resultList.events[i];
+
+    // Get Month and day from currentEvent.start.dateTimeCode
+    let currentDate = new Date(currentEvent.start.dateTimeCode);
     $(".results-container").append(`
     <div id="${currentEvent.id}" class="result-listing">
-  <div class="result-image-container">
-    <img
-      class="result-image"
-      src="${currentEvent.logoUrl}"
-      alt="${currentEvent.source.title}"
-    />
-  </div>
-  <div class="result-extras">
-    <div>Calandar</div>
-    <div class="js-event-price">Free: ${currentEvent.is_free}</div>
-  </div>
-  <div class="result-details">
-    <div class="result-details-time">
-      <div class="flip-card">
-        <div class="flip-card-inner">
-          <div class="">
-            <div class="calendar-icon flip-card-front">
-              <div class="calendar-icon-month"><p>Dec</p></div>
-              <div class="calendar-icon-day"><p>1</p></div>
+    <div class="result-image-container">
+      <img
+        class="result-image"
+        src="${currentEvent.logoUrl}"
+        alt="${currentEvent.source.title}"
+      />
+      <div class="js-event-price">Unknown</div>
+    </div>
+    <div class="result-details">
+      <div class="result-details-time">
+        <div class="flip-card">
+          <div class="flip-card-inner">
+            <div class="">
+              <div class="calendar-icon flip-card-front">
+                <div class="calendar-icon-month">
+                  <p>
+                    ${currentDate.toLocaleString("en-us", { month: "short" })}
+                  </p>
+                </div>
+                <div class="calendar-icon-day">
+                  <p>${currentDate.getDate()}</p>
+                </div>
+              </div>
             </div>
-          </div>
-          <div class="flip-card-back">
-            <p class="js-calendar-success"></p>
-            <button class="js-add-to-calendar">
-              <i class="far fa-calendar-plus"></i>
-            </button>
+            <div class="flip-card-back">
+              <p class="js-calendar-success"></p>
+              <button class="js-add-to-calendar">
+                <i class="far fa-calendar-plus"></i>
+              </button>
+            </div>
           </div>
         </div>
       </div>
+  
+      <div class="result-details-content">
+        <h2>
+          <a href="${currentEvent.source.url}" target="_blank"
+            >${currentEvent.source.title}</a
+          >
+        </h2>
+        <p>${currentEvent.start.dateTimeReadable}</p>
+        <p>${currentEvent.end.dateTimeReadable}</p>
+        <p class="js-event-location-name">${currentEvent.location.name}</p>
+        <p class="js-event-location-address">
+          ${currentEvent.location.address.localized_address_display}
+        </p>
+      </div>
     </div>
-
-    <div class="result-details-content">
-      <h2>
-        <a href="${currentEvent.source.url}" target="_blank"
-          >${currentEvent.source.title}</a
-        >
-      </h2>
-      <p>${currentEvent.start.dateTimeReadable}</p>
-      <p>${currentEvent.end.dateTimeReadable}</p>
-      <p class="js-event-location-name">${currentEvent.location.name}</p>
-      <p class="js-event-location-address">
-        ${currentEvent.location.address.localized_address_display}
-      </p>
+    <div class="result-more-description"></div>
+    <div class="result-more-info">
+      <p class="open-description">Click here for description</p>
     </div>
   </div>
-  <div class="result-more-description"></div>
-  <div class="result-more-info"><p>click for description</p></div>
-</div>`);
+  `);
+
+    if (currentEvent.is_free) {
+      $(".js-event-price").html('<span class="free-event">Free</span>');
+    } else {
+      $(".js-event-price").html(
+        '<i class="fas fa-dollar-sign paid-event"></i>'
+      );
+    }
 
     // Remove any unwanted tags
     $(".result-description img").remove();
@@ -457,39 +483,67 @@ function displayResults(pageNumber, numOfResults) {
  * This is for the "read more" button that appears on the bottom of each event result
  */
 function watchDescriptionButtons() {
-  // $(".results-container").on("click", ".result-more-info", event => {
-  //   const eventId = $(event.target)
-  //     .parent(".result-listing")
-  //     .attr("id");
-  //   let eventIndex = resultList.events.findIndex(
-  //     element => element.id === eventId
-  //   );
+  $(".results-container").on("click", ".result-more-info", event => {
+    // First we need to find what event target we clicked on and find its Event Index
+    const eventId = $(event.target)
+      .parent()
+      .parent()
+      .attr("id");
+    let eventIndex = resultList.events.findIndex(
+      element => element.id === eventId
+    );
 
-  //   $(`#${resultList.events[eventIndex].id}`)
-  //     .find(".result-more-description")
-  //     .append(resultList.events[eventIndex].description);
-  // });
+    if (
+      $(`#${resultList.events[eventIndex].id}`)
+        .find(".result-more-info p")
+        .hasClass("open-description")
+    ) {
+      // First close all other descriptions
+      $(".result-more-description").empty();
+      $(".result-listing").css("flex-basis", "0");
+      $(".result-more-info").html(
+        '<p class="open-description">Click here for description<p>'
+      );
 
-  
-  // $(".results-container").on("click", ".description-button", event => {
-  //   event.preventDefault();
-  //   // Once clicked, toggle between the two modes
-  //   $(event.target)
-  //     .parent()
-  //     .toggleClass("small-description large-description");
-  //   // Change the text depending on which is displayed
-  //   if (
-  //     $(event.target)
-  //       .parent()
-  //       .hasClass("large-description")
-  //   ) {
-  //     $(event.target).text("Colapse Description");
-  //   } else {
-  //     $(event.target).text("...Read More...");
-  //     let ele = $(event.target).closest(".result-listing")[0];
-  //     ele.scrollIntoView(true);
-  //   }
-  // });
+      // Here we can add the description
+      $(`#${resultList.events[eventIndex].id}`)
+        .find(".result-more-description")
+        .append(resultList.events[eventIndex].description.html);
+
+      // Oh no! We need to get rid of the images and objects
+      $(".result-more-description img").remove();
+      $(".result-more-description object").remove();
+
+      // Allow the result to grow big and stong
+      $(`#${resultList.events[eventIndex].id}`).css("flex-basis", "100%");
+
+      // Change the "Close description" text
+      $(`#${resultList.events[eventIndex].id}`)
+        .find(".result-more-info")
+        .html('<p class="close-description">Close description<p>');
+
+      // Scroll User's view
+      let ele = $(`#${resultList.events[eventIndex].id}`)[0];
+      ele.scrollIntoView(true);
+    } else {
+      // Empty the description
+      $(`#${resultList.events[eventIndex].id}`)
+        .find(".result-more-description")
+        .empty();
+
+      // Remove the flex growth
+      $(`#${resultList.events[eventIndex].id}`).css("flex-basis", "0");
+
+      // Change the "Click here for description" text
+      $(`#${resultList.events[eventIndex].id}`)
+        .find(".result-more-info")
+        .html('<p class="open-description">Click here for description<p>');
+
+      // Scroll User's view
+      let ele = $(`#${resultList.events[eventIndex].id}`)[0];
+      ele.scrollIntoView(true);
+    }
+  });
 }
 
 /**
@@ -524,7 +578,7 @@ function watchPageButtons() {
         resultList.currentPage--;
       }
       displayResults(resultList.currentPage, resultList.numberOfResults);
-      document.getElementById("pagination-top").scrollIntoView();
+      document.getElementById("filter-form").scrollIntoView();
     } else if ($(event.target).hasClass("js-page-next")) {
       if (
         resultList.currentPage <=
@@ -533,7 +587,7 @@ function watchPageButtons() {
         resultList.currentPage++;
       }
       displayResults(resultList.currentPage, resultList.numberOfResults);
-      document.getElementById("pagination-top").scrollIntoView();
+      document.getElementById("filter-form").scrollIntoView();
     }
   });
 }
@@ -588,34 +642,35 @@ function insertGoogleEvent(eventIndex) {
 function addResultsFilterHeader(previousQuery) {
   $(".filter-results").removeClass("hidden");
   $(".filter-results").html(`
-    <form class="js-form">
+    <form id="filter-form" class="js-form">
       <ul class="filter-list">
+
         <li class="form-line">
           <label for="location">Search another location: </label>
           <input type="text" name="location" class="js-location" placeholder="Denver, Co">
-        </li>
-        <li class="form-line">
           <label for="query">Search term: </label>
           <input type="text" name="query" class="js-query" placeholder="Entertainment">
+          <input name="filter" type="submit" value="Go!">
         </li>
-        <li class="form-line">
+
+
+        <li id="free-mode" class="form-line">
           <label for="free-mode">Show only free events</label>
           <input type="checkbox" name="free-mode" class="js-free-mode">
         </li>
-        <li class="form-line">
+
+        <li id="sort-by" class="form-line">
           <label for="sort-by">Sort by: </label>
           <select name="sort-by" class="js-sort-by">
-              <option value="best">Highest rated</option>
-              <option value="-best">Lowest rated</option>
               <option value="date">Soonest</option>
               <option value="-date">Latest</option>
+              <option value="best">Highest rated</option>
+              <option value="-best">Lowest rated</option>
               <option value="distance">Nearest</option>
               <option value="-distance">Furthest</option>
             </select>
         </li>
-        <li class="form-line">
-          <input name="filter" type="submit" value="Go!">
-        </li>
+
       </ul>
     </form>
   `);
