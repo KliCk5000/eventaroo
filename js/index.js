@@ -1,9 +1,9 @@
 const EVENTBRITE_TOKEN = "JRKAA3O73D" + "DJB47QH5OT";
-const FETCH_ADDITIONAL = true;
+const FETCH_PRICING = false; // Feature to be added in the future
 const resultList = {
   currentPage: 0,
-  numberOfResults: 12,
-  events: []
+  numberOfResults: 12, // How many results to display per page
+  events: [] // Where the list of events will be held once fetched.
 };
 
 /**
@@ -117,7 +117,7 @@ function loadResultsPage() {
 
 /**
  * fetchEventbriteData(queryParams)
- * ~queryParams is an object that contains all parameters you would like to send with fetch request
+ * @param {Object} queryParams is an object that contains all parameters you would like to send with fetch request
  * Send the GET request to the Eventbrite API to load our first list of results
  * This function should only get called once, because its the initial data.
  * We will make another GET request from then on out if the user wants to filter
@@ -149,6 +149,13 @@ function fetchEventbriteData(queryParams) {
     });
 }
 
+/**
+ * fetchLocationOfEventBriteData(eventId, venueId)
+ * @param eventId ID of current Event
+ * @param venueId ID of the current Events Venue
+ *
+ * This will attempt to grab location data for each event.
+ */
 function fetchLocationOfEventBriteData(eventId, venueId) {
   const url = `https://www.eventbriteapi.com/v3/venues/${venueId}/?token=${EVENTBRITE_TOKEN}`;
 
@@ -169,6 +176,14 @@ function fetchLocationOfEventBriteData(eventId, venueId) {
     });
 }
 
+/**
+ * setLocationOfEventBriteData(responseJson, eventId, venueId)
+ * @param responseJson The Json object that we fetched (useful for grabbing various address formats)
+ * @param eventId ID of current Event
+ * @param venueId ID of the current Events Venue
+ *
+ * This will attempt to set location data for each event.
+ */
 function setLocationOfEventBriteData(responseJson, eventId, venueId) {
   // Quickly process the result
   const location = {
@@ -210,6 +225,13 @@ function setLocationOfEventBriteData(responseJson, eventId, venueId) {
   }
 }
 
+/**
+ * fetchCostOfEventBriteData(eventId)
+ * @param eventId ID of current Event
+ *
+ * This will attempt to get the cost/price data for an event
+ * Note: Currently does not work as intended
+ */
 function fetchCostOfEventBriteData(eventId) {
   const url = `https://www.eventbriteapi.com/v3/events/${eventId}/ticket_classes/?token=${EVENTBRITE_TOKEN}`;
 
@@ -230,6 +252,14 @@ function fetchCostOfEventBriteData(eventId) {
     });
 }
 
+/**
+ * setCostOfEventBriteData(responseJson, eventId)
+ * @param responseJson The Json object that we fetched
+ * @param eventId ID of current Event
+ *
+ * This will attempt to set the cost/price data for an event
+ * Note: Currently does not work as intended
+ */
 function setCostOfEventBriteData(responseJson, eventId) {
   // Each event can have more than one price
   const costArray = new Array();
@@ -278,6 +308,8 @@ function setCostOfEventBriteData(responseJson, eventId) {
 
 /**
  * formatQueryParams(params)
+ * @param {Object} params of keys and values
+ *
  * Takes an object of keys and values and turns it into something like:
  * ?location.address=Denver%2C%20co&location.within=10mi&price=free
  */
@@ -288,6 +320,13 @@ function formatQueryParams(params) {
   return queryItems.join("&");
 }
 
+/**
+ * processResults(responseJson)
+ * @param responseJson The Json object that we fetched
+ *
+ * This function processes the Json Object into my one data object to make it easier
+ * to work with
+ */
 function processResults(responseJson) {
   resultList.currentPage = 0;
 
@@ -331,10 +370,11 @@ function processResults(responseJson) {
     endDateTime = endDateTime.toLocaleDateString("en-US", dateOptions);
 
     // Go fetch some additional stuff we need
-    if (FETCH_ADDITIONAL) {
-      fetchLocationOfEventBriteData(event.id, event.venue_id);
+    fetchLocationOfEventBriteData(event.id, event.venue_id);
+
+    if (FETCH_PRICING) {
       if (event.is_free === false) {
-        // fetchCostOfEventBriteData(event.id);
+        fetchCostOfEventBriteData(event.id);
       }
     }
 
@@ -391,6 +431,13 @@ function processResults(responseJson) {
   console.log(resultList);
 }
 
+/**
+ * displayResults(pageNumber, numOfResults)
+ * @param pageNumber Current page that is to be displayed
+ * @param numOfResults Number of results per page (example: 12 per page)
+ *
+ * This will actually display the correct "current" objects on the screen
+ */
 function displayResults(pageNumber, numOfResults) {
   // Remove any loading screen
   $(".loading").empty();
@@ -488,6 +535,14 @@ function displayResults(pageNumber, numOfResults) {
     $(".result-description img").remove();
     $(".result-description object").remove();
   }
+
+  $(".js-free-mode").change(event => {
+    $(".filter-results").submit();
+  });
+
+  $(".js-sort-by").change(event => {
+    $(".filter-results").submit();
+  });
 }
 
 /**
@@ -631,6 +686,10 @@ function watchToTopButton() {
   });
 }
 
+/**
+ * watchAddToCalendarButton()
+ * Event listener for when you want to add an event to Google Calendar
+ */
 function watchAddToCalendarButton() {
   $(".results-container").on("click", ".js-add-to-calendar", event => {
     event.preventDefault();
@@ -638,6 +697,12 @@ function watchAddToCalendarButton() {
   });
 }
 
+/**
+ * insertGoogleEvent(eventIndex)
+ * @param eventIndex The index of the selected event
+ *
+ * This will create the event and attempt to insert it into the users Google Calendar
+ */
 function insertGoogleEvent(eventIndex) {
   const calId = "primary";
   const calendarEvent = {
@@ -682,7 +747,9 @@ function insertGoogleEvent(eventIndex) {
 
 /**
  * addResultsFilterHeader(previousQuery)
- * Show the filter header at the top of the page
+ * @param previousQuery The previous query information before the screen changed
+ *
+ * This is the section of the screen where the user can filter the results in various ways
  */
 function addResultsFilterHeader(previousQuery) {
   $(".filter-results").removeClass("hidden");
@@ -781,11 +848,15 @@ function watchResultsPage() {
   });
 }
 
-// When the user scrolls down 20px from the top of the document, show the button
+// When the user scrolls down, we need to display the back to top button
 window.onscroll = function() {
   scrollFunction();
 };
 
+/**
+ * scrollFunction()
+ * When the user scrolls down 20px from the top of the document, show the button
+ */
 function scrollFunction() {
   if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
     document.getElementById("top-button").style.display = "block";

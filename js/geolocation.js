@@ -1,3 +1,10 @@
+/**
+ * getReverseGeolocation(latitude, longitude)
+ * @latitude Latitude of the event
+ * @longitude Longitude of the event
+ *
+ * Given a Latitude and Longitude, this finds the location of the user
+ */
 function getReverseGeolocation(latitude, longitude) {
   const googleLatLng = `latlng=${latitude},${longitude}`;
   const google_url = "https://maps.googleapis.com/maps/api/geocode/json?";
@@ -25,12 +32,14 @@ function getReverseGeolocation(latitude, longitude) {
     });
 }
 
+// If we successfully get the users location
 function geoSuccess(position) {
   getReverseGeolocation(position.coords.latitude, position.coords.longitude);
-  $('#near-me').css('color', 'green');
+  $("#near-me").css("color", "green");
 }
 
+// If we do not get the users location
 function geoError() {
   $(".js-error-output").text(`Sorry, could not get location`);
-  $('#near-me').css('color', 'red');
+  $("#near-me").css("color", "red");
 }

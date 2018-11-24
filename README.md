@@ -1,6 +1,8 @@
-# Eventaroo
+# Eventaroo Summary
 
-Website to help users find events near them, based on price, and giving the ability to add events to their calendar.
+Website to help users find events near them, based on price, and giving the ability to add events to their Google calendar.
+
+Short User story:  If a user is looking for something to do, they can input their location, either by typing or clicking on the "find location" icon. They can then toggle wether or not the results display Free events only. The user is then taken to the results screen which shows a list of events withing a certain distance starting from soonest to latest. The user can eiher filter the results more, or click on an event to open the description or add to their google calendar.
 
 ## Live site
 
@@ -9,6 +11,10 @@ Website to help users find events near them, based on price, and giving the abil
 [Link to archived MVP version of Eventaroo - hosted on Surge](https://eventaroo-mvp.surge.sh)
 
 [Link to active beta Eventaroo Surge development build](https://eventaroo.surge.sh)
+
+## Technologies used
+
+HTML, CSS, Javascript, Jquery, API calls to Eventbrite/Google-Maps/Google-Calendar
 
 ## Version MVP (Minimal Viable Product)
 
@@ -30,21 +36,22 @@ Website to help users find events near them, based on price, and giving the abil
 
 <img src="content/Style-title.png" alt="Style Title" width="750">
 
-TODO
-[x] Add spacing on either side of the screen on results. 50px on results listing div.
+## Final version
 
-[x] Figure out description how to resize the result containers
+### Mobile
 
-[x] Buttons for pagination need to be smaller, arrow icon
+<img src="content/Final-title-mobile.png" alt="Final Title Screen on Mobile Version" width="400">
+<img src="content/Final-results-mobile.png" alt="Final Results Screen on Mobile Version" width="400">
 
-[x] seperate search another location and the other terms.
+### Desktop/other
+
+<img src="content/Final-Title.png" alt="Final Title Screen on Desktop Version" width="600">
+<img src="content/Final-results-ipad.png" alt="Final Results Screen on Ipad Version" width="500">
+<img src="content/Final-results-tv.png" alt="Final Results Screen on TV Version" width="600">
+
+
+## Other features to implement in future versions
 
 [ ] make the filter buttons submit when changed
-
-[x] Float left the title and float right the Log in with google.
-
-[x] fix pagination spacing on the bottom.
-
-Optional tasks:
 
 [ ] add page numbers to Pagination
