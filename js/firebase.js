@@ -63,6 +63,11 @@ $(".js-google-sign-in").on("click", e => {
     });
 });
 
+/**
+ * addToCallendar(event)
+ * @param {Object} event - Click event object
+ * Attempts to add an even to users primary calendar
+ */
 function addToCallendar(event) {
   // Calendar Config
   const calendarConfig = {

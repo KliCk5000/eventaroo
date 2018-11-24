@@ -9,7 +9,6 @@
   <link href="https://fonts.googleapis.com/css?family=Kodchasan:400,500,700|Permanent+Marker" rel="stylesheet">
   <link rel="stylesheet" type="text/css" media="screen" href="css/normalize.css" />
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
-  <!-- <link rel="stylesheet" type="text/css" media="screen" href="css/index.css" /> -->
   <link rel="stylesheet" type="text/css" media="screen" href="css/style.css" />
   <meta name="description" content="Eventaroo is the best place to find out what events are happening around you.">
 </head>
@@ -18,6 +17,7 @@
   <!-- Header that will always show the logo -->
   <header role="banner" class="banner banner-landing background-image clearfix">
     <div class="logo landing-logo"><a href="index.html"><span class="orange">Event</span>aroo</a></div>
+
     <!-- This is an area where the user can easily log out of Google using OAuth2 -->
     <div id="firebaseui-auth-container" class="js-signon-container hidden">
       <span class="username"></span>
@@ -50,9 +50,9 @@
     </form>
   </section>
 
-
+  
   <section role="region" class="filter-results hidden">
-
+    <!-- Javascript will put the filter section here -->
   </section>
 
   <section role="region" class="results-container hidden">
@@ -60,7 +60,7 @@
   </section>
 
   <nav role="navigation" id="pagination-bottom" class="pagination center hidden">
-
+    <!-- Pagination arrows to scroll through results -->
   </nav>
 
   <button id="top-button" class="top-button" value="Go to top">Back to top of page</button>
