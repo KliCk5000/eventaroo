@@ -535,6 +535,14 @@ function displayResults(pageNumber, numOfResults) {
     $(".result-description img").remove();
     $(".result-description object").remove();
   }
+
+  $(".js-free-mode").change(event => {
+    $(".filter-results").submit();
+  });
+
+  $(".js-sort-by").change(event => {
+    $(".filter-results").submit();
+  });
 }
 
 /**
