@@ -58,12 +58,10 @@ function changeToResultPage(landingPageQuery) {
   // Remove the landing page
   $(".landing-container").empty();
 
-  $("html").height("auto");
-  $("body").height("auto");
-
   // Unhide the results container
   $(".results-container").toggleClass("hidden");
   $(".js-signon-container").toggleClass("hidden");
+  $(".pagination").toggleClass("hidden");
 
   // Remove the logo background-image
   $(".banner").removeClass("background-image");
@@ -74,15 +72,21 @@ function changeToResultPage(landingPageQuery) {
   $(".logo").removeClass("landing-logo");
   $(".logo").addClass("results-logo");
 
+  // Remove any errors you had on the landing page
+  $(".js-error-output").empty();
+
   // Send the landingPageQuery that we got from the landing page and
   // make the API request which will display the data on the results
   // page.
   const queryParams = {
     "location.address": landingPageQuery.location,
-    "location.within": "10mi",
-    sort_by: "date",
-    price: landingPageQuery.isFreeModeChecked ? "free" : "paid"
+    "location.within": "30mi",
+    sort_by: "date"
   };
+
+  if (landingPageQuery.isFreeModeChecked) {
+    queryParams.price = "free";
+  }
   fetchEventbriteData(queryParams);
 
   // Show the Results Filter Header to let the user change their query
@@ -97,6 +101,7 @@ function changeToResultPage(landingPageQuery) {
   watchAddToCalendarButton();
   watchDescriptionButtons();
   watchPageButtons();
+  watchToTopButton();
 }
 
 /**
@@ -387,15 +392,19 @@ function processResults(responseJson) {
 }
 
 function displayResults(pageNumber, numOfResults) {
+  // Remove any loading screen
   $(".loading").empty();
 
+  // Insert pagination buttons
   $(".pagination").html(`
     <input type="button" class="js-page-previous" value="&laquo;" href="#pagination-top">
     <input type="button" class="js-page-next" value="&raquo;" href="#pagination-top">
   `);
 
+  // Clear any results currently displayed
   $(".results-container").empty();
 
+  // The first Index is the first result that will display
   let firstIndex = pageNumber * numOfResults;
 
   for (
@@ -405,56 +414,67 @@ function displayResults(pageNumber, numOfResults) {
   ) {
     let currentEvent = resultList.events[i];
 
+    // Do some additional logic for free or paid events
+    let priceHtml = "";
+
+    if (currentEvent.is_free) {
+      priceHtml = '<span class="free-event">Free</span>';
+    } else {
+      priceHtml = '<i class="fas fa-dollar-sign paid-event"></i>';
+    }
+
     // Get Month and day from currentEvent.start.dateTimeCode
     let currentDate = new Date(currentEvent.start.dateTimeCode);
     $(".results-container").append(`
     <div id="${currentEvent.id}" class="result-listing">
-    <div class="result-image-container">
-      <img
-        class="result-image"
-        src="${currentEvent.logoUrl}"
-        alt="${currentEvent.source.title}"
-      />
-      <div class="js-event-price">Unknown</div>
-    </div>
-    <div class="result-details">
-      <div class="result-details-time">
-        <div class="flip-card">
-          <div class="flip-card-inner">
-            <div class="">
-              <div class="calendar-icon flip-card-front">
-                <div class="calendar-icon-month">
-                  <p>
-                    ${currentDate.toLocaleString("en-us", { month: "short" })}
-                  </p>
-                </div>
-                <div class="calendar-icon-day">
-                  <p>${currentDate.getDate()}</p>
+    <div class="result-header">
+      <div class="result-image-container">
+        <img
+          class="result-image"
+          src="${currentEvent.logoUrl}"
+          alt="${currentEvent.source.title}"
+        />
+        <div class="js-event-price">${priceHtml}</div>
+      </div>
+      <div class="result-details">
+        <div class="result-details-time">
+          <div class="flip-card">
+            <div class="flip-card-inner">
+              <div class="">
+                <div class="calendar-icon flip-card-front">
+                  <div class="calendar-icon-month">
+                    <p>
+                      ${currentDate.toLocaleString("en-us", { month: "short" })}
+                    </p>
+                  </div>
+                  <div class="calendar-icon-day">
+                    <p>${currentDate.getDate()}</p>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div class="flip-card-back">
-              <p class="js-calendar-success"></p>
-              <button class="js-add-to-calendar">
-                <i class="far fa-calendar-plus"></i>
-              </button>
+              <div class="flip-card-back">
+                <p class="js-calendar-success"></p>
+                <button class="js-add-to-calendar">
+                  <i class="far fa-calendar-plus"></i>
+                </button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
   
-      <div class="result-details-content">
-        <h2>
-          <a href="${currentEvent.source.url}" target="_blank"
-            >${currentEvent.source.title}</a
-          >
-        </h2>
-        <p>${currentEvent.start.dateTimeReadable}</p>
-        <p>${currentEvent.end.dateTimeReadable}</p>
-        <p class="js-event-location-name">${currentEvent.location.name}</p>
-        <p class="js-event-location-address">
-          ${currentEvent.location.address.localized_address_display}
-        </p>
+        <div class="result-details-content">
+          <h2>
+            <a href="${currentEvent.source.url}" target="_blank"
+              >${currentEvent.source.title}</a
+            >
+          </h2>
+          <p>${currentEvent.start.dateTimeReadable}</p>
+          <p>${currentEvent.end.dateTimeReadable}</p>
+          <p class="js-event-location-name">${currentEvent.location.name}</p>
+          <p class="js-event-location-address">
+            ${currentEvent.location.address.localized_address_display}
+          </p>
+        </div>
       </div>
     </div>
     <div class="result-more-description"></div>
@@ -463,14 +483,6 @@ function displayResults(pageNumber, numOfResults) {
     </div>
   </div>
   `);
-
-    if (currentEvent.is_free) {
-      $(".js-event-price").html('<span class="free-event">Free</span>');
-    } else {
-      $(".js-event-price").html(
-        '<i class="fas fa-dollar-sign paid-event"></i>'
-      );
-    }
 
     // Remove any unwanted tags
     $(".result-description img").remove();
@@ -504,6 +516,9 @@ function watchDescriptionButtons() {
       $(".result-more-info").html(
         '<p class="open-description">Click here for description<p>'
       );
+      $(".result-header")
+        .addClass("result-closed")
+        .removeClass("result-open");
 
       // Here we can add the description
       $(`#${resultList.events[eventIndex].id}`)
@@ -516,6 +531,12 @@ function watchDescriptionButtons() {
 
       // Allow the result to grow big and stong
       $(`#${resultList.events[eventIndex].id}`).css("flex-basis", "100%");
+
+      // Change the flex on the result header
+      $(`#${resultList.events[eventIndex].id}`)
+        .find(".result-header")
+        .addClass("result-open")
+        .removeClass("result-closed");
 
       // Change the "Close description" text
       $(`#${resultList.events[eventIndex].id}`)
@@ -533,6 +554,12 @@ function watchDescriptionButtons() {
 
       // Remove the flex growth
       $(`#${resultList.events[eventIndex].id}`).css("flex-basis", "0");
+
+      // Change the flex on the result header
+      $(`#${resultList.events[eventIndex].id}`)
+        .find(".result-header")
+        .addClass("result-closed")
+        .removeClass("result-open");
 
       // Change the "Click here for description" text
       $(`#${resultList.events[eventIndex].id}`)
@@ -592,6 +619,18 @@ function watchPageButtons() {
   });
 }
 
+/**
+ * watchToTopButton()
+ * Event listener for when you want to scroll to top.
+ */
+function watchToTopButton() {
+  $("#top-button").on("click", event => {
+    event.preventDefault();
+    document.body.scrollTop = 0; // For Safari
+    document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+  });
+}
+
 function watchAddToCalendarButton() {
   $(".results-container").on("click", ".js-add-to-calendar", event => {
     event.preventDefault();
@@ -625,12 +664,18 @@ function insertGoogleEvent(eventIndex) {
       console.log(response);
       if (response.status === 200) {
         $(`#${resultList.events[eventIndex].id}`)
-          .find(".js-calendar-success")
-          .text("Successfully added to Calendar!");
+          .find(".js-add-to-calendar")
+          .html('<i class="far fa-calendar-check success"></i>');
+        $(`#${resultList.events[eventIndex].id}`)
+          .find(".calendar-icon-day")
+          .html('<i class="far fa-calendar-check success"></i>');
       } else {
         $(`#${resultList.events[eventIndex].id}`)
-          .find(".js-calendar-success")
-          .text("Unfortunately, something bad happened.");
+          .find(".js-add-to-calendar")
+          .html('<i class="far fa-calendar-times error"></i>');
+        $(`#${resultList.events[eventIndex].id}`)
+          .find(".calendar-icon-day")
+          .html('<i class="far fa-calendar-times error"></i>');
       }
     });
 }
@@ -642,37 +687,48 @@ function insertGoogleEvent(eventIndex) {
 function addResultsFilterHeader(previousQuery) {
   $(".filter-results").removeClass("hidden");
   $(".filter-results").html(`
-    <form id="filter-form" class="js-form">
-      <ul class="filter-list">
-
-        <li class="form-line">
-          <label for="location">Search another location: </label>
-          <input type="text" name="location" class="js-location" placeholder="Denver, Co">
-          <label for="query">Search term: </label>
-          <input type="text" name="query" class="js-query" placeholder="Entertainment">
-          <input name="filter" type="submit" value="Go!">
-        </li>
-
-
-        <li id="free-mode" class="form-line">
-          <label for="free-mode">Show only free events</label>
-          <input type="checkbox" name="free-mode" class="js-free-mode">
-        </li>
-
-        <li id="sort-by" class="form-line">
-          <label for="sort-by">Sort by: </label>
-          <select name="sort-by" class="js-sort-by">
-              <option value="date">Soonest</option>
-              <option value="-date">Latest</option>
-              <option value="best">Highest rated</option>
-              <option value="-best">Lowest rated</option>
-              <option value="distance">Nearest</option>
-              <option value="-distance">Furthest</option>
-            </select>
-        </li>
-
-      </ul>
-    </form>
+  <form id="filter-form" class="js-form">
+  <div class="filter-list">
+    <div class="search-filters">
+      <div>
+        <label for="location">Location: </label>
+        <input
+          type="text"
+          name="location"
+          class="js-location"
+          placeholder="Denver, Co"
+        />
+      </div>
+      <div>
+        <label for="query">Search: </label>
+        <input
+          type="text"
+          name="query"
+          class="js-query"
+          placeholder="Entertainment"
+        />
+      </div>
+      <div><input name="filter" type="submit" value="Go!" /></div>
+    </div>
+    <div class="quick-filters">
+      <div>
+        <label for="free-mode">Show only free events</label>
+        <input type="checkbox" name="free-mode" class="js-free-mode" />
+      </div>
+      <div>
+        <label for="sort-by">Sort by: </label>
+        <select name="sort-by" class="js-sort-by">
+          <option value="date">Soonest</option>
+          <option value="-date">Latest</option>
+          <option value="best">Highest rated</option>
+          <option value="-best">Lowest rated</option>
+          <option value="distance">Nearest</option>
+          <option value="-distance">Furthest</option>
+        </select>
+      </div>
+    </div>
+  </div>
+</form>
   `);
 
   $(".js-location").val(previousQuery.location);
@@ -691,10 +747,13 @@ function watchResultsPage() {
     const resultQuery = {
       "location.address": $(".js-location").val(),
       q: $(".js-query").val(),
-      "location.within": "10mi",
-      sort_by: $(".js-sort-by").val(),
-      price: $(".js-free-mode").is(":checked") ? "free" : "paid"
+      "location.within": "30mi",
+      sort_by: $(".js-sort-by").val()
     };
+
+    if ($(".js-free-mode").is(":checked")) {
+      resultQuery.price = "free";
+    }
 
     // Grab the previous values so you can update the next screen
     let isChecked = $(".js-free-mode").is(":checked");
@@ -733,12 +792,6 @@ function scrollFunction() {
   } else {
     document.getElementById("top-button").style.display = "none";
   }
-}
-
-// When the user clicks on the button, scroll to the top of the document
-function topFunction() {
-  document.body.scrollTop = 0; // For Safari
-  document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
 }
 
 /**

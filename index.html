@@ -17,7 +17,7 @@
 <body>
   <!-- Header that will always show the logo -->
   <header role="banner" class="banner banner-landing background-image clearfix">
-    <div class="logo landing-logo"><span class="orange">Event</span>aroo</div>
+    <div class="logo landing-logo"><a href="index.html"><span class="orange">Event</span>aroo</a></div>
     <!-- This is an area where the user can easily log out of Google using OAuth2 -->
     <div id="firebaseui-auth-container" class="js-signon-container hidden">
       <span class="username"></span>
@@ -55,19 +55,15 @@
 
   </section>
 
-  <nav role="navigation" id="pagination-top" class="pagination center hidden">
-
-  </nav>
-
   <section role="region" class="results-container hidden">
     <!-- Javascript will put results html here -->
   </section>
 
-  <nav role="navigation" id="pagination-bottom" class="pagination center">
+  <nav role="navigation" id="pagination-bottom" class="pagination center hidden">
 
   </nav>
 
-  <button onclick="topFunction()" id="top-button" class="top-button" value="Go to top">Back to top of page</button>
+  <button id="top-button" class="top-button" value="Go to top">Back to top of page</button>
 
   <footer role="contentinfo" class="center">
     <p class="footer-credit">This project was made by Nick Dean and the source can be found <a href="https://github.com/KliCk5000/eventaroo">here
