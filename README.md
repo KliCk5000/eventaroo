@@ -52,6 +52,6 @@ HTML, CSS, Javascript, Jquery, API calls to Eventbrite/Google-Maps/Google-Calend
 
 ## Other features to implement in future versions
 
-[ ] make the filter buttons submit when changed
+[x] make the filter buttons submit when changed
 
 [ ] add page numbers to Pagination
