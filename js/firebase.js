@@ -76,6 +76,14 @@ function addToCallendar(event) {
     scope: "https://www.googleapis.com/auth/calendar.events"
   };
 
+  // Get the event they clicked on
+  const eventId = $(event.target)
+    .parents(".result-listing")
+    .attr("id");
+  let eventIndex = resultList.events.findIndex(
+    element => element.id === eventId
+  );
+
   var currentEvent = event;
   // check if signed into google
   if (firebase.auth().currentUser) {
@@ -94,9 +102,12 @@ function addToCallendar(event) {
               console.log("Google OAuth2 is signed in");
               insertEvent(currentEvent);
             } else {
-              $(".js-calendar-success").text(
-                "Something went wrong with Google Authentication, so you cant add to google calander. Try again later."
-              );
+              $(`#${resultList.events[eventIndex].id}`)
+                .find(".js-add-to-calendar")
+                .html('<i class="far fa-calendar-times error"></i>');
+              $(`#${resultList.events[eventIndex].id}`)
+                .find(".calendar-icon-day")
+                .html('<i class="far fa-calendar-times error"></i>');
               console.log(
                 "Something went wrong with Google Authentication, so you cant add to google calander"
               );
@@ -120,9 +131,12 @@ function addToCallendar(event) {
                 console.log("Google OAuth2 is signed in");
                 insertEvent(currentEvent);
               } else {
-                $(".js-calendar-success").text(
-                  "Something went wrong with Google Authentication, so you cant add to google calander. Try again later."
-                );
+                $(`#${resultList.events[eventIndex].id}`)
+                  .find(".js-add-to-calendar")
+                  .html('<i class="far fa-calendar-times error"></i>');
+                $(`#${resultList.events[eventIndex].id}`)
+                  .find(".calendar-icon-day")
+                  .html('<i class="far fa-calendar-times error"></i>');
                 console.log(
                   "Something went wrong with Google Authentication, so you cant add to google calander"
                 );
@@ -148,9 +162,12 @@ function addToCallendar(event) {
             console.log("Google OAuth2 is signed in");
             insertEvent(currentEvent);
           } else {
-            $(".js-calendar-success").text(
-              "Something went wrong with Google Authentication, so you cant add to google calander. Try again later."
-            );
+            $(`#${resultList.events[eventIndex].id}`)
+              .find(".js-add-to-calendar")
+              .html('<i class="far fa-calendar-times error"></i>');
+            $(`#${resultList.events[eventIndex].id}`)
+              .find(".calendar-icon-day")
+              .html('<i class="far fa-calendar-times error"></i>');
             console.log(
               "Something went wrong with Google Authentication, so you cant add to google calander"
             );
@@ -172,7 +189,7 @@ function addToCallendar(event) {
 function insertEvent(event) {
   // Get the event they clicked on
   const eventId = $(event.target)
-    .parent(".result-listing")
+    .parents(".result-listing")
     .attr("id");
   let eventIndex = resultList.events.findIndex(
     element => element.id === eventId
